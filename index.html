@@ -1,0 +1,4305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Firebase Admin Panel</title>
+  <meta name="description"
+    content="Professional Firebase Firestore Admin Panel - Manage collections and documents with ease." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-primary: #0a0d14;
+      --bg-secondary: #111520;
+      --bg-card: #161b2e;
+      --bg-hover: #1e2540;
+      --bg-input: #0d1117;
+      --accent-blue: #4f8ef7;
+      --accent-purple: #a855f7;
+      --accent-cyan: #22d3ee;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-orange: #f97316;
+      --text-primary: #e8eaf0;
+      --text-secondary: #8892a4;
+      --text-muted: #4a5568;
+      --border: #1e2540;
+      --border-light: #2a3455;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 48px rgba(0, 0, 0, 0.6);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-xs: 6px;
+      --gradient: linear-gradient(135deg, #4f8ef7, #a855f7);
+      --gradient-card: linear-gradient(135deg, rgba(79, 142, 247, 0.08), rgba(168, 85, 247, 0.08));
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-light);
+      border-radius: 99px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-blue);
+    }
+
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--gradient);
+      border-radius: var(--radius-xs);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(79, 142, 247, 0.3);
+    }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 700;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      background: var(--bg-card);
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+    }
+
+    .header-clock {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-primary);
+      background: var(--bg-card);
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      box-shadow: inset 0 0 8px rgba(79, 142, 247, 0.08);
+    }
+
+    .version-badge {
+      background: var(--gradient);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 4px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(79, 142, 247, 0.3);
+    }
+
+    .clock-flag {
+      font-size: 15px;
+      line-height: 1;
+    }
+
+    .clock-date {
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 12px;
+    }
+
+    .clock-time {
+      color: var(--accent-cyan);
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: all 0.3s;
+    }
+
+    .status-dot.connected {
+      background: var(--accent-green);
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: pulse 2s infinite;
+    }
+
+    .status-dot.error {
+      background: var(--accent-red);
+      box-shadow: 0 0 8px var(--accent-red);
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .main-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width, 280px);
+      min-width: var(--sidebar-width, 280px);
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: width 0.3s ease, min-width 0.3s ease, transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-add-collection {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-xs);
+      background: var(--gradient);
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 0 12px rgba(79, 142, 247, 0.3);
+    }
+
+    .btn-add-collection:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(79, 142, 247, 0.5);
+    }
+
+    .sidebar-search {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .collection-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .collection-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      margin-bottom: 2px;
+    }
+
+    .collection-item:hover {
+      background: var(--bg-hover);
+      border-color: var(--border);
+    }
+
+    .collection-item.active {
+      background: var(--gradient-card);
+      border-color: rgba(79, 142, 247, 0.3);
+    }
+
+    .collection-item.active .collection-name {
+      color: var(--accent-blue);
+    }
+
+    .collection-icon {
+      font-size: 16px;
+      opacity: 0.8;
+    }
+
+    .collection-name {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .collection-delete {
+      opacity: 0;
+      background: none;
+      border: none;
+      color: var(--accent-red);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: all 0.2s;
+    }
+
+    .collection-item:hover .collection-delete {
+      opacity: 1;
+    }
+
+    .collection-delete:hover {
+      background: rgba(239, 68, 68, 0.15);
+    }
+
+    .sidebar-empty {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .sidebar-empty .empty-icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+
+    .sidebar-empty p {
+      font-size: 13px;
+    }
+
+    .content {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .content-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: var(--bg-secondary);
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+    }
+
+    .breadcrumb-item {
+      color: var(--text-secondary);
+    }
+
+    .breadcrumb-sep {
+      color: var(--text-muted);
+    }
+
+    .breadcrumb-active {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .content-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: white;
+      box-shadow: 0 0 16px rgba(79, 142, 247, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 24px rgba(79, 142, 247, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-light);
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--accent-red);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.22);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .content-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .welcome-icon {
+      font-size: 72px;
+      margin-bottom: 24px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-12px);
+      }
+    }
+
+    .welcome h2 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      max-width: 400px;
+      line-height: 1.6;
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 140px;
+      transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+      border-color: var(--border-light);
+      transform: translateY(-2px);
+    }
+
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .stat-info .stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stat-info .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .table-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead tr {
+      background: var(--bg-secondary);
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr {
+      transition: background 0.2s ease, transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    tbody tr:hover {
+      background: var(--bg-hover);
+      transform: translateX(4px);
+    }
+
+    .doc-id {
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .field-preview {
+      color: var(--text-secondary);
+      max-width: 280px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 6px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    tbody tr:hover .row-actions {
+      opacity: 1;
+    }
+
+    .loading-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-text {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-state .empty-icon {
+      font-size: 52px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      width: 100%;
+      max-width: 500px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border);
+      position: relative;
+      animation: modalPopIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes modalPopIn {
+      0% { transform: scale(0.95); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 700px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.95) translateY(10px);
+      transition: transform 0.25s;
+    }
+
+    .modal-overlay.show .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modal-title-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-xs);
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: var(--radius-xs);
+      transition: all 0.2s;
+      line-height: 1;
+    }
+
+    .btn-close:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 10px 14px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-control::placeholder {
+      color: var(--text-muted);
+    }
+
+    .form-control:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.12);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 100px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+    }
+
+    .form-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 5px;
+    }
+
+    .form-error {
+      font-size: 12px;
+      color: var(--accent-red);
+      margin-top: 5px;
+    }
+
+    .fields-editor {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 110px 1.5fr 32px;
+      gap: 8px;
+      align-items: start;
+      background: var(--bg-secondary);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    .field-row:hover {
+      border-color: var(--border-light);
+    }
+
+    .select-control {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      padding: 9px 10px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%238892a4' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .select-control:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .btn-remove-field {
+      background: none;
+      border: none;
+      color: var(--accent-red);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: var(--radius-xs);
+      font-size: 16px;
+      line-height: 1;
+      transition: background 0.2s;
+      align-self: center;
+    }
+
+    .btn-remove-field:hover {
+      background: rgba(239, 68, 68, 0.12);
+    }
+
+    .btn-add-field {
+      background: var(--bg-secondary);
+      border: 1px dashed var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn-add-field:hover {
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+      background: rgba(79, 142, 247, 0.05);
+    }
+
+    .json-viewer {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: var(--text-primary);
+    }
+
+    .btn-view-mode {
+      background: none;
+      border: none;
+      padding: 5px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: var(--radius-xs);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-view-mode:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-view-mode.active {
+      background: var(--accent-blue);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(79, 142, 247, 0.35);
+    }
+
+    .doc-readable-viewer {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      max-height: 460px;
+      overflow-y: auto;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .readable-value-box {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .readable-fields-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .readable-field-item {
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 14px;
+    }
+
+    .readable-field-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .readable-field-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .field-badge {
+      background: rgba(79, 142, 247, 0.15);
+      color: var(--accent-blue);
+      font-weight: 600;
+      font-size: 12px;
+      padding: 3px 9px;
+      border-radius: 4px;
+    }
+
+    .field-type-tag {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .readable-field-val {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding-left: 2px;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--shadow-lg);
+      min-width: 280px;
+      max-width: 360px;
+      transform: translateX(120%);
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      border-left: 3px solid var(--accent-green);
+    }
+
+    .toast.error {
+      border-left: 3px solid var(--accent-red);
+    }
+
+    .toast.info {
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    .toast-icon {
+      font-size: 20px;
+    }
+
+    .toast-msg {
+      font-size: 13px;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .confirm-modal {
+      max-width: 420px;
+    }
+
+    .btn-sidebar-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 22px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    /* ── COLLECTION OWNER LABEL (Admin View) ── */
+    .collection-owner-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--accent-purple);
+      background: rgba(168, 85, 247, 0.12);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 99px;
+      padding: 1px 7px;
+      margin-top: 2px;
+      display: inline-block;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 140px;
+    }
+    .collection-item-inner {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 50;
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .field-sub-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 64px;
+        height: calc(100vh - 64px);
+        z-index: 60;
+        transform: translateX(-100%);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay {
+        display: block;
+      }
+
+      .sidebar-overlay.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .btn-sidebar-toggle {
+        display: flex;
+      }
+
+      .content {
+        width: 100%;
+      }
+
+      .content-header {
+        padding: 14px 16px;
+      }
+
+      .content-body {
+        padding: 14px 16px;
+      }
+
+      .field-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .field-row .field-val-wrap {
+        grid-column: 1 / -1;
+      }
+
+      .field-row .btn-remove-field {
+        grid-column: 2;
+        justify-self: end;
+      }
+
+      .stats-bar {
+        gap: 10px;
+      }
+
+      .stat-card {
+        min-width: 120px;
+        padding: 12px 14px;
+      }
+
+      table {
+        min-width: 500px;
+      }
+
+      .row-actions {
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 0 14px;
+      }
+
+      .logo-text {
+        font-size: 15px;
+      }
+
+      .header-status span {
+        display: none;
+      }
+
+      .modal {
+        max-height: 95vh;
+        border-radius: var(--radius) var(--radius) 0 0;
+      }
+
+      .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+      }
+    }
+
+    /* ── LOGIN PAGE ── */
+    #loginPage {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: var(--bg-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+
+    #loginPage.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .login-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .login-bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      animation: orbFloat 8s ease-in-out infinite;
+    }
+
+    .login-bg-orb:nth-child(1) {
+      width: 500px;
+      height: 500px;
+      background: #4f8ef7;
+      top: -150px;
+      left: -100px;
+      animation-delay: 0s;
+    }
+
+    .login-bg-orb:nth-child(2) {
+      width: 400px;
+      height: 400px;
+      background: #a855f7;
+      bottom: -120px;
+      right: -80px;
+      animation-delay: 3s;
+    }
+
+    .login-bg-orb:nth-child(3) {
+      width: 300px;
+      height: 300px;
+      background: #22d3ee;
+      top: 40%;
+      left: 55%;
+      animation-delay: 5s;
+    }
+
+    @keyframes orbFloat {
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1);
+      }
+
+      50% {
+        transform: translateY(-30px) scale(1.05);
+      }
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 1;
+      background: rgba(22, 27, 46, 0.82);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(79, 142, 247, 0.18);
+      border-radius: 20px;
+      padding: 44px 40px 36px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.04);
+      animation: loginCardIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    @keyframes loginCardIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .login-logo-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 0 32px rgba(79, 142, 247, 0.4);
+      animation: logoGlow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes logoGlow {
+      from {
+        box-shadow: 0 0 20px rgba(79, 142, 247, 0.3);
+      }
+
+      to {
+        box-shadow: 0 0 40px rgba(168, 85, 247, 0.5);
+      }
+    }
+
+    .login-title {
+      text-align: center;
+      margin-bottom: 6px;
+      font-size: 22px;
+      font-weight: 800;
+      background: var(--gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      letter-spacing: 0.3px;
+    }
+
+    .login-form-group {
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .login-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 7px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .login-input-wrap {
+      position: relative;
+    }
+
+    .login-input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: var(--text-muted);
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+
+    .login-input {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px 12px 44px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .login-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .login-input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.15);
+    }
+
+    .login-input:focus+.login-input-icon,
+    .login-input-wrap:focus-within .login-input-icon {
+      color: var(--accent-blue);
+    }
+
+    .login-pw-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 16px;
+      padding: 4px;
+      transition: color 0.2s;
+      border-radius: 4px;
+    }
+
+    .login-pw-toggle:hover {
+      color: var(--accent-blue);
+    }
+
+    .login-remember {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 24px;
+      cursor: pointer;
+    }
+
+    .login-remember input[type=checkbox] {
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+      accent-color: var(--accent-blue);
+    }
+
+    .login-remember-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--gradient);
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      box-shadow: 0 4px 20px rgba(79, 142, 247, 0.3);
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: 0.3px;
+    }
+
+    .login-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(79, 142, 247, 0.45);
+    }
+
+    .login-btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .login-error {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: var(--radius-xs);
+      padding: 10px 14px;
+      color: var(--accent-red);
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20%,
+      60% {
+        transform: translateX(-6px);
+      }
+
+      40%,
+      80% {
+        transform: translateX(6px);
+      }
+    }
+
+    .login-error.show {
+      display: block;
+    }
+
+    .login-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .login-footer strong {
+      color: var(--text-secondary);
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0 20px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── LOGIN/REGISTER TAB TOGGLE ── */
+    .login-tab-bar {
+      display: flex;
+      margin-bottom: 24px;
+      background: var(--bg-input);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+      border: 1px solid var(--border);
+    }
+    .login-tab-btn {
+      flex: 1;
+      padding: 9px 12px;
+      background: none;
+      border: none;
+      border-radius: calc(var(--radius-sm) - 2px);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .login-tab-btn.active {
+      background: var(--gradient);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(79,142,247,0.3);
+    }
+    .login-tab-btn:not(.active):hover {
+      color: var(--text-primary);
+    }
+    .login-success-msg {
+      background: rgba(16,185,129,0.1);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: var(--radius-xs);
+      padding: 10px 14px;
+      color: #10b981;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+      text-align: center;
+    }
+    .login-success-msg.show { display: block; }
+    .login-select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px 12px 44px;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.25s;
+      appearance: none;
+      cursor: pointer;
+    }
+    .login-select:focus { border-color: var(--accent-blue); }
+    body.theme-light .login-select { background: #fff; }
+
+    /* ── INLINE VALIDATION ── */
+    .login-input.is-invalid, .login-select.is-invalid {
+      border-color: #ef4444 !important;
+      background-color: rgba(239, 68, 68, 0.05);
+    }
+    .inline-error {
+      color: #ef4444;
+      font-size: 12px;
+      margin-top: 6px;
+      display: none;
+      font-weight: 500;
+    }
+    .inline-error.show {
+      display: block;
+      animation: shake 0.4s ease;
+    }
+
+    /* ── SKELETON LOADERS ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-input) 25%, var(--border) 50%, var(--bg-input) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-loading 1.5s infinite;
+      border-radius: var(--radius-sm);
+      display: block;
+    }
+    @keyframes skeleton-loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-text { height: 16px; margin-bottom: 8px; width: 100%; }
+    .skeleton-text.short { width: 60%; margin-bottom: 0; }
+    .skeleton-avatar { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; }
+
+    /* Logout button in header */
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: var(--accent-red);
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: var(--accent-red);
+    }
+
+    /* Modals that should always appear on top of any page/modal (including loginPage z-index:9000) */
+    #confirmModal,
+    #adminLoginModal,
+    #themeModal {
+      z-index: 10000 !important;
+    }
+
+    /* ── FULLSCREEN NOTEPAD MODAL ── */
+    #notepadModal .modal {
+      max-width: 96vw;
+      width: 96vw;
+      height: 92vh;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notepad-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 24px;
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .notepad-tools-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .notepad-tools-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .notepad-select {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      color: var(--text-primary);
+      padding: 7px 12px;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+      min-width: 180px;
+    }
+
+    .notepad-select:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .notepad-title-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      color: var(--text-primary);
+      padding: 7px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      width: 260px;
+      outline: none;
+    }
+
+    .notepad-title-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .notepad-textarea {
+      flex: 1;
+      width: 100%;
+      background: var(--bg-input);
+      border: none;
+      padding: 24px;
+      color: var(--text-primary);
+      font-family: 'Inter', 'Courier New', monospace;
+      font-size: 15px;
+      line-height: 1.8;
+      resize: none;
+      outline: none;
+    }
+
+    /* ── THEME CUSTOMIZER STYLES ── */
+    body.theme-light {
+      --bg-primary: #f2f4f8;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-hover: #e8ecf4;
+      --bg-input: #ffffff;
+      --text-primary: #1e2540;
+      --text-secondary: #5a657e;
+      --text-muted: #8892a4;
+      --border: #dcdfe8;
+      --border-light: #c8cedc;
+      --shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 48px rgba(0, 0, 0, 0.12);
+    }
+
+    body.theme-purple {
+      --accent-blue: #a855f7;
+      --gradient: linear-gradient(135deg, #a855f7, #ec4899);
+    }
+
+    body.theme-green {
+      --accent-blue: #10b981;
+      --gradient: linear-gradient(135deg, #10b981, #06b6d4);
+    }
+
+    body.theme-orange {
+      --accent-blue: #f97316;
+      --gradient: linear-gradient(135deg, #f97316, #eab308);
+    }
+
+    .theme-option-group {
+      margin-bottom: 20px;
+    }
+
+    .theme-option-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .theme-grid {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .theme-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 12px 14px;
+      background: var(--bg-input);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--text-secondary);
+    }
+
+    .theme-btn.active {
+      border-color: var(--accent-blue);
+      background: rgba(79, 142, 247, 0.08);
+      color: var(--accent-blue);
+    }
+
+    .color-swatch {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* ── MOBILE VIEW OPTIMIZATION ── */
+    @media (max-width: 768px) {
+      header {
+        height: auto !important;
+        min-height: 60px;
+        padding: 12px 16px !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      header > div:first-child {
+        width: 100%;
+        justify-content: space-between;
+      }
+      header > div:last-child {
+        width: 100%;
+        justify-content: space-between;
+        gap: 8px !important;
+        flex-wrap: wrap !important;
+      }
+      .header-clock,
+      .header-status {
+        display: none !important;
+      }
+      .logo-text {
+        font-size: 15px !important;
+      }
+      .btn-sidebar-toggle {
+        padding: 6px 10px !important;
+      }
+      .main-content {
+        padding: 14px !important;
+      }
+      .modal-card,
+      .login-card {
+        width: 95% !important;
+        margin: 10px auto !important;
+        padding: 20px !important;
+      }
+      table {
+        font-size: 13px !important;
+      }
+      th, td {
+        padding: 10px 8px !important;
+      }
+    }
+    
+    /* invert calendar icon on dark mode */
+    body:not(.theme-light) input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+    }
+    
+    #viewDocModal .modal {
+      max-width: 96vw;
+      width: 96vw;
+    }
+
+    /* ── FULLSCREEN DOCUMENT EDIT MODAL ── */
+    #documentModal .modal {
+      max-width: 96vw;
+      width: 96vw;
+      max-height: 96vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #documentModal .modal-body {
+      overflow-y: auto;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #documentModal #normalDocFields,
+    #documentModal #simpleValueWrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #documentModal #normalDocFields > .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 0;
+    }
+
+    #documentModal textarea.form-control {
+      flex: 1;
+      min-height: 0;
+      resize: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ LOGIN PAGE ══ -->
+  <div id="loginPage">
+    <div class="login-bg">
+      <div class="login-bg-orb"></div>
+      <div class="login-bg-orb"></div>
+      <div class="login-bg-orb"></div>
+    </div>
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-logo-icon">🔥</div>
+      </div>
+      <h1 class="login-title">FireAdmin Panel</h1>
+      <p class="login-subtitle">Sign in or register to access your Firebase dashboard</p>
+
+      <!-- Tab Toggle -->
+      <div class="login-tab-bar">
+        <button class="login-tab-btn active" id="tabLoginBtn" onclick="switchLoginTab('login')">🔑 Sign In</button>
+        <button class="login-tab-btn" id="tabRegisterBtn" onclick="switchLoginTab('register')">📝 Register</button>
+      </div>
+
+      <!-- ── LOGIN FORM ── -->
+      <div id="loginFormSection">
+        <div class="login-error" id="loginError"></div>
+
+        <div class="login-form-group">
+          <label class="login-label" for="loginUsername">Username</label>
+          <div class="login-input-wrap">
+            <input class="login-input" type="text" id="loginUsername" placeholder="Enter your username"
+              autocomplete="username" oninput="clearInlineError('loginUsername')" />
+            <span class="login-input-icon">👤</span>
+          </div>
+          <div class="inline-error" id="err-loginUsername"></div>
+        </div>
+
+        <div class="login-form-group">
+          <label class="login-label" for="loginPassword">Password</label>
+          <div class="login-input-wrap" style="position:relative;">
+            <input class="login-input" type="password" id="loginPassword" placeholder="Enter your password"
+              autocomplete="current-password" oninput="clearInlineError('loginPassword')" />
+            <span class="login-input-icon">🔒</span>
+            <button class="login-pw-toggle" id="pwToggle" type="button" onclick="togglePasswordVisibility('loginPassword', 'pwToggle')"
+              title="Show/Hide Password">👁</button>
+          </div>
+          <div class="inline-error" id="err-loginPassword"></div>
+        </div>
+
+        <label class="login-remember">
+          <input type="checkbox" id="rememberMe" />
+          <span class="login-remember-label">Remember me on this device</span>
+        </label>
+
+        <button class="login-btn" id="loginBtn" onclick="doLogin()">
+          <span id="loginBtnText">🚀 Sign In</span>
+        </button>
+
+        <div class="login-footer"
+          style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;width:100%;margin-top:20px;">
+          <span>Secured by <strong>Firebase Firestore</strong></span>
+          <button class="btn btn-ghost btn-sm" onclick="openAdminLoginModal()"
+            style="font-size:12px;color:var(--accent-cyan);padding:4px 12px;border:1px solid rgba(34,211,238,0.3);border-radius:99px;cursor:pointer;font-weight:600;">🔐
+            Admin Access</button>
+        </div>
+      </div>
+
+      <!-- ── REGISTER FORM ── -->
+      <div id="registerFormSection" style="display:none;">
+        <div class="login-error" id="registerError"></div>
+        <div class="login-success-msg" id="registerSuccess"></div>
+
+        <div class="login-form-group">
+          <label class="login-label" for="regCountry">🌍 Country</label>
+          <div class="login-input-wrap">
+            <select class="login-select" id="regCountry" onchange="clearInlineError('regCountry')">
+              <option value="">-- Select your country --</option>
+              <option>Afghanistan</option><option>Albania</option><option>Algeria</option><option>Argentina</option>
+              <option>Australia</option><option>Austria</option><option>Azerbaijan</option>
+              <option>Bahrain</option><option>Bangladesh</option><option>Belgium</option>
+              <option>Bolivia</option><option>Brazil</option><option>Bulgaria</option>
+              <option>Cambodia</option><option>Cameroon</option><option>Canada</option><option>Chile</option>
+              <option>China</option><option>Colombia</option><option>Croatia</option>
+              <option>Czech Republic</option><option>Denmark</option><option>Ecuador</option>
+              <option>Egypt</option><option>Ethiopia</option><option>Finland</option><option>France</option>
+              <option>Germany</option><option>Ghana</option><option>Greece</option><option>Guatemala</option>
+              <option>Hungary</option><option>India</option><option>Indonesia</option><option>Iran</option>
+              <option>Iraq</option><option>Ireland</option><option>Israel</option><option>Italy</option>
+              <option>Japan</option><option>Jordan</option><option>Kazakhstan</option><option>Kenya</option>
+              <option>Kuwait</option><option>Lebanon</option><option>Libya</option><option>Malaysia</option>
+              <option>Mexico</option><option>Morocco</option><option>Myanmar</option>
+              <option>Nepal</option><option>Netherlands</option><option>New Zealand</option>
+              <option>Nigeria</option><option>North Korea</option><option>Norway</option>
+              <option>Oman</option><option>Pakistan</option><option>Palestine</option>
+              <option>Peru</option><option>Philippines</option><option>Poland</option>
+              <option>Portugal</option><option>Qatar</option><option>Romania</option>
+              <option>Russia</option><option>Saudi Arabia</option><option>Senegal</option>
+              <option>Singapore</option><option>South Africa</option><option>South Korea</option>
+              <option>Spain</option><option>Sri Lanka</option><option>Sudan</option>
+              <option>Sweden</option><option>Switzerland</option><option>Syria</option>
+              <option>Taiwan</option><option>Thailand</option><option>Tunisia</option>
+              <option>Turkey</option><option>Ukraine</option><option>United Arab Emirates</option>
+              <option>United Kingdom</option><option>United States</option><option>Uzbekistan</option>
+              <option>Venezuela</option><option>Vietnam</option><option>Yemen</option><option>Zimbabwe</option>
+            </select>
+            <span class="login-input-icon" style="pointer-events:none;">🌍</span>
+          </div>
+          <div class="inline-error" id="err-regCountry"></div>
+        </div>
+
+        <div class="login-form-group">
+          <label class="login-label" for="regUsername">👤 Username</label>
+          <div class="login-input-wrap">
+            <input class="login-input" type="text" id="regUsername" placeholder="Choose a username"
+              autocomplete="off" oninput="clearInlineError('regUsername')" />
+            <span class="login-input-icon">👤</span>
+          </div>
+          <div class="inline-error" id="err-regUsername"></div>
+        </div>
+
+        <div class="login-form-group" style="margin-bottom:20px;">
+          <label class="login-label" for="regPassword">🔒 Password</label>
+          <div class="login-input-wrap" style="position:relative;">
+            <input class="login-input" type="password" id="regPassword" placeholder="Choose a password" oninput="clearInlineError('regPassword')" />
+            <span class="login-input-icon">🔒</span>
+            <button class="login-pw-toggle" id="regPwToggle" type="button" onclick="togglePasswordVisibility('regPassword', 'regPwToggle')"
+              title="Show/Hide Password">👁</button>
+          </div>
+          <div class="inline-error" id="err-regPassword"></div>
+        </div>
+
+        <button class="login-btn" id="registerBtn" onclick="doRegisterRequest()">
+          <span id="registerBtnText">📨 Send Registration Request</span>
+        </button>
+
+        <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--text-muted);">
+          Your request will be reviewed by an Admin. You will be able to login once approved.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-container" id="appContainer" style="display:none;">
+
+    <header>
+      <div class="logo">
+        <button class="btn-sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="logo-icon">🔥</div>
+        <span class="logo-text">FireAdmin Panel</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div class="header-clock" id="bdRealTimeClock" title="Real-time Online Bangladesh Time (Asia/Dhaka)">
+          <span class="version-badge">V-1</span>
+          <span class="clock-flag">🇧🇩</span>
+          <span id="bdClockDate" class="clock-date">--/--/----</span>
+          <span id="bdClockTime" class="clock-time">--:--:-- --</span>
+        </div>
+        <div class="header-status">
+          <div class="status-dot" id="statusDot"></div>
+          <span id="statusText">Connecting…</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="openThemeModal()"
+            style="padding:6px 12px;border-radius:99px;font-size:12px;display:flex;align-items:center;gap:6px;">🎨
+            Theme</button>
+          <button id="headerAdminAccessBtn" class="btn btn-secondary btn-sm" onclick="goToAdminCenter()"
+            style="display:none;padding:6px 12px;border-radius:99px;font-size:12px;align-items:center;gap:6px;background:var(--accent-purple);color:#fff;border:none;font-weight:600;cursor:pointer;box-shadow:0 0 10px rgba(168,85,247,0.4);">🔐
+            Admin Panel</button>
+          <span id="headerUsername" style="font-size:13px;color:var(--text-secondary);font-weight:600;"></span>
+          <button class="btn-logout" onclick="doLogout()">⏻ Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+    <div class="main-body">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Collections</span>
+          <button class="btn-add-collection" onclick="openAddCollectionModal()" title="Add Collection">+</button>
+        </div>
+        <div class="sidebar-search">
+          <input type="text" class="search-input" id="collectionSearch" placeholder="🔍 Search collections…"
+            oninput="filterCollections()" />
+        </div>
+        <div class="collection-list" id="collectionList">
+          <div class="sidebar-empty">
+            <div class="empty-icon">📂</div>
+            <p>No collections yet.<br />Click <strong>+</strong> to add one.</p>
+          </div>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="content-header" id="contentHeader" style="display:none;">
+          <div class="breadcrumb">
+            <span class="breadcrumb-item">🔥 Firestore</span>
+            <span class="breadcrumb-sep">›</span>
+            <span class="breadcrumb-active" id="breadcrumbCollection">—</span>
+          </div>
+          <div class="content-actions">
+            <button class="btn btn-secondary btn-sm" onclick="refreshDocuments()">⟳ Refresh</button>
+          </div>
+        </div>
+        <div class="content-body" id="contentBody">
+          <div class="welcome" id="welcomeScreen">
+            <div class="welcome-icon">🔥</div>
+            <h2>Firebase Admin Panel</h2>
+            <p>Select a collection from the sidebar or create a new one to start managing your Firestore data.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  <!-- ── end #appContainer ── -->
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ADD COLLECTION MODAL -->
+  <div class="modal-overlay" id="addCollectionModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div class="modal-title-icon">📁</div>Add New Collection
+        </div>
+        <button class="btn-close" onclick="closeModal('addCollectionModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Collection ID</label>
+          <input type="text" class="form-control" id="newCollectionId" placeholder="e.g. users, products, orders…" />
+          <div class="form-hint">Collection IDs are case-sensitive and cannot contain slashes.</div>
+          <div class="form-error" id="collectionIdError" style="display:none;"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('addCollectionModal')">Cancel</button>
+        <button class="btn btn-primary" onclick="addCollection()">📁 Add Collection</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD/EDIT DOCUMENT MODAL -->
+  <div class="modal-overlay" id="documentModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div class="modal-title-icon" id="docModalIcon">📄</div>
+          <span id="docModalTitle">Add Document</span>
+        </div>
+        <button class="btn-close" onclick="closeModal('documentModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Document Type selector: only shown when adding new document -->
+        <div class="form-group" id="docTypeSection" style="margin-bottom: 15px;">
+          <label class="form-label">Document Type</label>
+          <div style="display:flex;gap:15px;align-items:center;">
+            <label style="cursor:pointer;"><input type="radio" name="docType" value="normal" checked onchange="toggleDocType()"> Normal</label>
+            <label style="cursor:pointer;"><input type="radio" name="docType" value="hwid" onchange="toggleDocType()"> HWID Type</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Document ID</label>
+          <input type="text" class="form-control" id="docIdInput" placeholder="Leave blank to auto-generate…" />
+          <div class="form-hint">If left blank, Firestore will generate a unique ID automatically.</div>
+        </div>
+        <div id="normalDocFields">
+          <div class="form-group">
+            <label class="form-label">Value</label>
+            <div id="simpleValueWrap">
+              <textarea class="form-control" id="simpleValueInput" rows="50"
+                placeholder="Enter value here… (text, JSON, numbers — anything)"
+                style="min-height:200px;font-size:14px;line-height:1.7;resize:vertical;"></textarea>
+            </div>
+            <!-- hidden fields used by multi-field editor (edit mode) -->
+            <div class="fields-editor" id="fieldsEditor" style="display:none;"></div>
+          </div>
+        </div>
+        <div id="hwidDocFields" style="display:none;">
+          <div class="form-group">
+            <label class="form-label" style="display:flex;justify-content:space-between;align-items:center;">
+              <span>HWID Entries (HWID, Name, Date)</span>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="addHwidRow()" style="padding:2px 8px;font-size:12px;">+ Add Row</button>
+            </label>
+            <div id="hwidRowsContainer" style="display:flex;flex-direction:column;gap:10px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('documentModal')">Cancel</button>
+        <button class="btn btn-primary" id="docModalSaveBtn" onclick="saveDocument()">💾 Save Document</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIEW DOCUMENT MODAL -->
+  <div class="modal-overlay" id="viewDocModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div class="modal-title-icon">🔍</div><span id="viewDocTitle">Document</span>
+        </div>
+        <button class="btn-close" onclick="closeModal('viewDocModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom:16px;">
+          <label class="form-label">Document ID</label>
+          <div
+            style="font-family:'Courier New',monospace;font-size:13px;padding:10px 14px;background:var(--bg-input);border-radius:var(--radius-xs);border:1px solid var(--border);color:var(--accent-cyan);"
+            id="viewDocId"></div>
+        </div>
+        <div
+          style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <label class="form-label" style="margin:0;">Document Content</label>
+          <div
+            style="display:flex;gap:4px;background:var(--bg-input);padding:3px;border-radius:var(--radius-xs);border:1px solid var(--border);">
+            <button type="button" class="btn-view-mode active" id="btnViewModeReadable"
+              onclick="switchViewMode('readable')">📄 Normal View</button>
+            <button type="button" class="btn-view-mode" id="btnViewModeJson"
+              onclick="switchViewMode('json')"><code>{ }</code> JSON</button>
+          </div>
+        </div>
+        <div id="viewDocReadable" class="doc-readable-viewer"></div>
+        <pre class="json-viewer" id="viewDocJson" style="display:none;margin-top:0;"></pre>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('viewDocModal')">Close</button>
+        <button class="btn btn-danger btn-sm" id="viewDocDeleteBtn">🗑 Delete</button>
+        <button class="btn btn-primary" id="viewDocEditBtn">✏️ Edit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFIRM MODAL -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal confirm-modal">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div class="modal-title-icon" style="background:linear-gradient(135deg,#ef4444,#f97316);">⚠️</div>Confirm
+          Delete
+        </div>
+        <button class="btn-close" onclick="closeModal('confirmModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-secondary);font-size:14px;line-height:1.6;" id="confirmMessage">Are you sure?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('confirmModal')">Cancel</button>
+        <button class="btn btn-danger" id="confirmBtn">🗑 Confirm Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULLSCREEN NOTEPAD MODAL -->
+  <div class="modal-overlay" id="notepadModal">
+    <div class="modal" style="margin:auto;">
+      <div class="notepad-toolbar">
+        <div class="notepad-tools-left">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:20px;">📝</span>
+            <span style="font-weight:700;font-size:15px;color:var(--text-primary);">Notepad</span>
+          </div>
+          <select class="notepad-select" id="notepadDocSelect" onchange="switchNotepadDocument(this.value)"
+            title="Select Note Document">
+            <option value="">Loading notes...</option>
+          </select>
+          <button class="btn btn-secondary btn-sm" onclick="createNewNotepad()"
+            title="Create another Notepad document">+ New Notepad</button>
+          <input type="text" class="notepad-title-input" id="notepadTitleInput"
+            placeholder="Note Title (e.g. Daily Tasks)" />
+        </div>
+        <div class="notepad-tools-right">
+          <span class="notepad-status" id="notepadStatusText">💡 Ctrl+S to save</span>
+          <button class="btn btn-danger btn-sm" onclick="deleteCurrentNotepad()" title="Delete this note">🗑
+            Delete</button>
+          <button class="btn btn-primary btn-sm" id="notepadSaveBtn" onclick="saveCurrentNotepad()"
+            title="Save Note (Ctrl+S)">💾 Save</button>
+          <button class="btn-close" onclick="closeModal('notepadModal')"
+            style="font-size:20px;padding:4px 8px;">✕</button>
+        </div>
+      </div>
+      <textarea class="notepad-textarea" id="notepadContentInput"
+        placeholder="Type your notes here... (Press Ctrl + S to save automatically to this collection)"></textarea>
+    </div>
+  </div>
+
+  <!-- THEME CUSTOMIZER MODAL -->
+  <div class="modal-overlay" id="themeModal">
+    <div class="modal" style="max-width:480px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <div class="modal-title-icon" style="background:var(--gradient);">🎨</div>Theme Customizer
+        </div>
+        <button class="btn-close" onclick="closeModal('themeModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="theme-option-group">
+          <div class="theme-option-title">Color Scheme (Mode)</div>
+          <div class="theme-grid">
+            <button class="theme-btn" id="btnModeDark" onclick="setThemeMode('dark')">🌙 Dark Mode</button>
+            <button class="theme-btn" id="btnModeLight" onclick="setThemeMode('light')">☀️ Light Mode</button>
+          </div>
+        </div>
+
+        <div class="theme-option-group">
+          <div class="theme-option-title">Accent Color</div>
+          <div class="theme-grid">
+            <button class="theme-btn" id="btnAccentBlue" onclick="setThemeAccent('blue')"><span class="color-swatch"
+                style="background:#4f8ef7;"></span> Blue</button>
+            <button class="theme-btn" id="btnAccentPurple" onclick="setThemeAccent('purple')"><span class="color-swatch"
+                style="background:#a855f7;"></span> Purple</button>
+            <button class="theme-btn" id="btnAccentGreen" onclick="setThemeAccent('green')"><span class="color-swatch"
+                style="background:#10b981;"></span> Green</button>
+            <button class="theme-btn" id="btnAccentOrange" onclick="setThemeAccent('orange')"><span class="color-swatch"
+                style="background:#f97316;"></span> Orange</button>
+          </div>
+        </div>
+
+        <div class="theme-option-group" style="margin-bottom:0;">
+          <div class="theme-option-title">Sidebar Width</div>
+          <div class="theme-grid">
+            <button class="theme-btn" id="btnWidthCompact" onclick="setSidebarWidth(220)">▫️ Compact</button>
+            <button class="theme-btn" id="btnWidthNormal" onclick="setSidebarWidth(280)">◽ Normal</button>
+            <button class="theme-btn" id="btnWidthWide" onclick="setSidebarWidth(340)">◻️ Wide</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="resetThemeSettings()">↺ Reset to Default</button>
+        <button class="btn btn-primary" onclick="closeModal('themeModal')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN LOGIN MODAL -->
+  <div class="modal-overlay" id="adminLoginModal">
+    <div class="modal" style="max-width:420px;margin:auto;">
+      <div class="modal-header" style="background:var(--bg-secondary);">
+        <div class="modal-title">
+          <div class="modal-title-icon" style="background:linear-gradient(135deg,#ef4444,#a855f7);">🔐</div>Admin Login
+        </div>
+        <button class="btn-close" onclick="closeModal('adminLoginModal')">✕</button>
+      </div>
+      <div class="modal-body" style="padding:24px;">
+        <p style="font-size:13px;color:var(--text-secondary);margin-bottom:18px;">Sign in using credentials from
+          Firebase <strong>"admin"</strong> collection to access User Management & Activity Log.</p>
+        <div class="login-error" id="adminLoginError" style="margin-bottom:14px;"></div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminUsername">Admin Username (Doc ID)</label>
+          <input class="form-control" type="text" id="adminUsername" placeholder="e.g. admin" autocomplete="username" />
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" for="adminPassword">Admin Password</label>
+          <input class="form-control" type="password" id="adminPassword" placeholder="Enter admin password"
+            autocomplete="current-password" />
+        </div>
+
+        <label class="login-remember"
+          style="margin-bottom:20px;display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="adminRememberMe" checked />
+          <span class="login-remember-label" style="font-size:13px;color:var(--text-secondary);">Remember admin session
+            on this device</span>
+        </label>
+
+        <button class="btn btn-primary" id="adminLoginBtn" onclick="doAdminLogin()"
+          style="width:100%;padding:12px;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;">
+          <span id="adminLoginBtnText">🚀 Login as Admin</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, addDoc, setDoc,
+      doc, deleteDoc, getDoc, updateDoc, arrayUnion, arrayRemove, deleteField, query, limit,
+      initializeFirestore, persistentLocalCache, persistentMultipleTabManager, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBCu63RjqZTs7aTUBDGRYh0_CtiQGXu3GM",
+      authDomain: "panel-aebbf.firebaseapp.com",
+      projectId: "panel-aebbf",
+      storageBucket: "panel-aebbf.firebasestorage.app",
+      messagingSenderId: "459148323115",
+      appId: "1:459148323115:web:f1109b6b254a26bfc27d6e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    let db;
+    try {
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+      });
+    } catch (e) {
+      console.warn("Persistent cache failed, falling back to default firestore.", e);
+      db = getFirestore(app);
+    }
+    // State
+    // ── EMPTY STATE SVGS ──
+    const svgEmptyFolder = `<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px; opacity:0.3;"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path><line x1="9" y1="14" x2="15" y2="14"></line></svg>`;
+    const svgLock = `<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px; opacity:0.3;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>`;
+    const svgEmptyDoc = `<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:16px; opacity:0.3;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
+
+    let collections = [];
+    let currentCollection = null;
+    let currentDocuments = [];
+    let editingDocId = null;
+    let confirmCallback = null;
+    let loggedInUser = null;
+    let currentNotepadId = null;
+    let currentUserRole = 'Standard';       // 'Admin' or 'Standard'
+    let currentUserAllowedCollections = []; // empty = all (admin), or list of allowed collection names
+    let collectionOwnerMap = {};            // { collectionName: [username1, username2, ...] } — Admin view only
+
+    // ── DEBOUNCE HELPER ──
+    function debounce(func, delay) {
+      let timeoutId;
+      return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // ── LOGIN SYSTEM ──
+
+    function showLoginPage() {
+      document.getElementById('loginPage').style.display = 'flex';
+      document.getElementById('appContainer').style.display = 'none';
+      document.getElementById('loginPage').classList.remove('hide');
+    }
+
+    async function checkAdminAccessButton(username) {
+      const btn = document.getElementById('headerAdminAccessBtn');
+      if (!btn) return;
+      try {
+        let isAdmin = false;
+        // 1. Check if user is in 'admin' collection first
+        const adminSnap = await getDoc(doc(db, 'admin', username));
+        if (adminSnap.exists()) {
+          isAdmin = true;
+        } else {
+          // 2. Fallback: check role in 'users' collection
+          const snap = await getDoc(doc(db, 'users', username));
+          if (snap.exists()) {
+            const data = snap.data();
+            const role = (data.role || '').toLowerCase();
+            isAdmin = (role === 'admin' || role === 'admin access' || role === 'administrator');
+          }
+        }
+        btn.style.display = isAdmin ? 'inline-flex' : 'none';
+        localStorage.setItem('fa_user_role', isAdmin ? 'Admin' : 'Standard');
+      } catch (_) {
+        const cachedRole = localStorage.getItem('fa_user_role');
+        btn.style.display = (cachedRole === 'Admin') ? 'inline-flex' : 'none';
+      }
+    }
+
+    window.goToAdminCenter = async function () {
+      const user = loggedInUser || localStorage.getItem('fa_user') || sessionStorage.getItem('fa_user') || localStorage.getItem('fa_admin_user') || sessionStorage.getItem('fa_admin_user');
+      const token = localStorage.getItem('fa_token') || sessionStorage.getItem('fa_token') || localStorage.getItem('fa_admin_token') || sessionStorage.getItem('fa_admin_token');
+      if (!user || !token) {
+        showToast('error', 'Authentication Required', 'Please sign in first with token/password.');
+        return;
+      }
+      localStorage.setItem('fa_admin_user', user);
+      localStorage.setItem('fa_admin_token', token);
+      window.location.href = 'main.html';
+    };
+
+    async function showAppPanel(username) {
+      loggedInUser = username;
+      document.getElementById('headerUsername').textContent = '👤 ' + username;
+      checkAdminAccessButton(username);
+      // Load user role & allowed collections
+      await loadUserRoleAndCollections(username);
+      const lp = document.getElementById('loginPage');
+      lp.classList.add('hide');
+      setTimeout(() => {
+        lp.style.display = 'none';
+        document.getElementById('appContainer').style.display = 'flex';
+      }, 400);
+      // Load collections after login
+      fetchFirestoreCollections();
+    }
+
+    // Load user role and allowed_collections from Firebase
+    async function loadUserRoleAndCollections(username) {
+      try {
+        // Check admin collection first
+        const adminSnap = await getDoc(doc(db, 'admin', username));
+        if (adminSnap.exists()) {
+          currentUserRole = 'Admin';
+          currentUserAllowedCollections = [];
+          localStorage.setItem('fa_user_role', 'Admin');
+          return;
+        }
+        // Check users collection
+        const userSnap = await getDoc(doc(db, 'users', username));
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          const role = (data.role || '').toLowerCase();
+          const isAdmin = (role === 'admin' || role === 'admin access' || role === 'administrator');
+          currentUserRole = isAdmin ? 'Admin' : 'Standard';
+          currentUserAllowedCollections = Array.isArray(data.allowed_collections) ? data.allowed_collections : [];
+          localStorage.setItem('fa_user_role', currentUserRole);
+        }
+      } catch (e) {
+        console.warn('Could not load user role:', e.message);
+        // Fallback to cached role
+        currentUserRole = localStorage.getItem('fa_user_role') || 'Standard';
+      }
+    }
+
+    // ── INLINE VALIDATION HELPERS ──
+    function setInlineError(inputId, msg) {
+      const input = document.getElementById(inputId);
+      if (input) input.classList.add('is-invalid');
+      const errEl = document.getElementById(`err-${inputId}`);
+      if (errEl) {
+        errEl.textContent = msg;
+        errEl.classList.add('show');
+        // trigger animation
+        errEl.style.animation = 'none';
+        errEl.offsetHeight; // reflow
+        errEl.style.animation = '';
+      }
+    }
+    window.clearInlineError = function(inputId) {
+      const input = document.getElementById(inputId);
+      if (input) input.classList.remove('is-invalid');
+      const errEl = document.getElementById(`err-${inputId}`);
+      if (errEl) {
+        errEl.textContent = '';
+        errEl.classList.remove('show');
+      }
+    };
+
+    window.togglePasswordVisibility = function (inputId, btnId) {
+      const input = document.getElementById(inputId);
+      const btn = document.getElementById(btnId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁';
+      }
+    };
+
+    // ── LOGIN/REGISTER TAB SWITCH ──
+    window.switchLoginTab = function(tab) {
+      const loginSec = document.getElementById('loginFormSection');
+      const regSec = document.getElementById('registerFormSection');
+      const tabLogin = document.getElementById('tabLoginBtn');
+      const tabReg = document.getElementById('tabRegisterBtn');
+      if (tab === 'login') {
+        loginSec.style.display = 'block';
+        regSec.style.display = 'none';
+        tabLogin.classList.add('active');
+        tabReg.classList.remove('active');
+      } else {
+        loginSec.style.display = 'none';
+        regSec.style.display = 'block';
+        tabLogin.classList.remove('active');
+        tabReg.classList.add('active');
+        // clear messages
+        document.getElementById('registerError').classList.remove('show');
+        document.getElementById('registerSuccess').classList.remove('show');
+      }
+    };
+
+    // ── REGISTRATION REQUEST SUBMIT ──
+    window.doRegisterRequest = async function() {
+      const errEl = document.getElementById('registerError');
+      const successEl = document.getElementById('registerSuccess');
+      errEl.classList.remove('show');
+      successEl.classList.remove('show');
+
+      // Clear previous inline errors
+      clearInlineError('regCountry');
+      clearInlineError('regUsername');
+      clearInlineError('regPassword');
+
+      const country = document.getElementById('regCountry').value;
+      const username = document.getElementById('regUsername').value.trim();
+      const password = document.getElementById('regPassword').value;
+
+      let hasError = false;
+      if (!country) { setInlineError('regCountry', 'Please select your country.'); hasError = true; }
+      if (!username) { setInlineError('regUsername', 'Username is required.'); hasError = true; }
+      else if (username.includes('/')) { setInlineError('regUsername', 'Slashes are not allowed.'); hasError = true; }
+      if (password.length < 4) { setInlineError('regPassword', 'Password must be at least 4 characters.'); hasError = true; }
+
+      if (hasError) return;
+
+      const btn = document.getElementById('registerBtn');
+      const btnText = document.getElementById('registerBtnText');
+      btn.disabled = true;
+      btnText.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;"></span> Sending…';
+
+      try {
+        // Check if username already exists in users or pending requests
+        const existingUser = await getDoc(doc(db, 'users', username));
+        if (existingUser.exists()) {
+          errEl.textContent = '❌ This username is already taken. Please choose another.';
+          errEl.classList.add('show');
+          btn.disabled = false;
+          btnText.textContent = '📨 Send Registration Request';
+          return;
+        }
+        const existingReq = await getDoc(doc(db, 'registration_requests', username));
+        if (existingReq.exists() && existingReq.data().status === 'pending') {
+          errEl.textContent = '⏳ A registration request for this username is already pending. Please wait for Admin approval.';
+          errEl.classList.add('show');
+          btn.disabled = false;
+          btnText.textContent = '📨 Send Registration Request';
+          return;
+        }
+        // Save registration request to Firebase
+        await setDoc(doc(db, 'registration_requests', username), {
+          username: username,
+          password: password,
+          country: country,
+          status: 'pending',
+          created_at: new Date().toISOString()
+        });
+        successEl.textContent = '✅ Registration request sent! Please wait for Admin approval. You will be able to login once approved.';
+        successEl.classList.add('show');
+        document.getElementById('regCountry').value = '';
+        document.getElementById('regUsername').value = '';
+        document.getElementById('regPassword').value = '';
+      } catch(e) {
+        errEl.textContent = '❌ Error: ' + e.message;
+        errEl.classList.add('show');
+      } finally {
+        btn.disabled = false;
+        btnText.textContent = '📨 Send Registration Request';
+      }
+    };
+
+    function setLoginError(msg) {
+      const el = document.getElementById('loginError');
+      el.textContent = msg;
+      el.classList.add('show');
+      // shake animation reset trick
+      el.style.animation = 'none';
+      el.offsetHeight; // reflow
+      el.style.animation = '';
+    }
+    function clearLoginError() {
+      const el = document.getElementById('loginError');
+      el.textContent = '';
+      el.classList.remove('show');
+    }
+
+    // ── MULTI-DEVICE SESSION TOKEN SYSTEM ──
+
+    // প্রতিটি browser-এর জন্য unique Device ID (একবার তৈরি হয়, localStorage-এ থাকে)
+    function getDeviceId() {
+      let deviceId = localStorage.getItem('fa_device_id');
+      if (!deviceId) {
+        const arr = new Uint8Array(16);
+        crypto.getRandomValues(arr);
+        deviceId = Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+        localStorage.setItem('fa_device_id', deviceId);
+      }
+      return deviceId;
+    }
+
+    // Secure random token তৈরি করো (64-char hex)
+    function generateToken() {
+      const arr = new Uint8Array(32);
+      crypto.getRandomValues(arr);
+      return Array.from(arr, b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Firebase-এ এই device-এর token save করো
+    // Structure: users/{username}/sessions.{deviceId} = { token, expires }
+    // অন্য device-এর sessions অপরিবর্তিত থাকে!
+    async function saveRememberToken(username, token) {
+      const deviceId = getDeviceId();
+      const expires = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 দিন
+      try {
+        await setDoc(doc(db, 'users', username), {
+          sessions: {
+            [deviceId]: { token, expires }
+          }
+        }, { merge: true });
+      } catch (e) {
+        console.warn('Token save failed:', e.message);
+      }
+    }
+
+    // শুধু এই device-এর token Firebase থেকে মুছে দাও
+    // অন্য device-এর session অক্ষুণ্ণ থাকবে!
+    async function clearRememberToken(username) {
+      const deviceId = getDeviceId();
+      try {
+        await updateDoc(doc(db, 'users', username), {
+          [`sessions.${deviceId}`]: deleteField()
+        });
+      } catch (e) {
+        console.warn('Token clear failed:', e.message);
+      }
+    }
+
+    window.doLogin = async function () {
+      clearLoginError();
+      clearInlineError('loginUsername');
+      clearInlineError('loginPassword');
+
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const remember = document.getElementById('rememberMe').checked;
+
+      let hasError = false;
+      if (!username) { setInlineError('loginUsername', 'Username is required.'); hasError = true; }
+      if (!password) { setInlineError('loginPassword', 'Password is required.'); hasError = true; }
+      
+      if (hasError) return;
+
+      const btn = document.getElementById('loginBtn');
+      const btnText = document.getElementById('loginBtnText');
+      btn.disabled = true;
+      btnText.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;"></span> Verifying…';
+
+      try {
+        // Firebase users collection থেকে verify করো
+        const userRef = doc(db, 'users', username);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          setLoginError('❌ Invalid username or password.');
+          btn.disabled = false;
+          btnText.textContent = '🚀 Sign In';
+          return;
+        }
+
+        const userData = userSnap.data();
+        const storedPassword = userData.password || userData.passwoard || userData.pass || '';
+        if (storedPassword !== password) {
+          setLoginError('❌ Invalid username or password.');
+          btn.disabled = false;
+          btnText.textContent = '🚀 Sign In';
+          return;
+        }
+
+        // লগইন সফল!
+        // পুরনো plaintext password entry মুছে দাও (legacy cleanup)
+        localStorage.removeItem('fa_pass');
+
+        // ── REMEMBER ME & SESSION: Secure Token System ──
+        const token = generateToken();
+        await saveRememberToken(username, token);
+
+        if (remember) {
+          localStorage.setItem('fa_remember', '1');
+          localStorage.setItem('fa_user', username);
+          localStorage.setItem('fa_token', token); // শুধু token, password নয়
+          sessionStorage.removeItem('fa_user');
+          sessionStorage.removeItem('fa_token');
+        } else {
+          // Remember Me নেই — শুধু session-এ রাখো (browser বন্ধ হলে মুছে যাবে)
+          sessionStorage.setItem('fa_user', username);
+          sessionStorage.setItem('fa_token', token);
+          localStorage.removeItem('fa_remember');
+          localStorage.removeItem('fa_user');
+          localStorage.removeItem('fa_token');
+        }
+
+        await logSystemActivity('USER_LOGIN', `users/${username}`, 'User successfully logged into Data Panel');
+        btnText.textContent = '✅ Success!';
+        setTimeout(() => showAppPanel(username), 500);
+
+      } catch (e) {
+        setLoginError('Connection error: ' + e.message);
+        btn.disabled = false;
+        btnText.textContent = '🚀 Sign In';
+      }
+    };
+
+    window.doLogout = async function () {
+      // Firebase থেকে remember token মুছে দাও (অন্য device থেকেও বাতিল হবে)
+      const savedUser = localStorage.getItem('fa_user') || sessionStorage.getItem('fa_user') || loggedInUser;
+      if (savedUser) {
+        clearRememberToken(savedUser); // async, await করি না — UI block করব না
+      }
+
+      loggedInUser = null;
+      sessionStorage.removeItem('fa_user');
+      sessionStorage.removeItem('fa_token');
+      sessionStorage.removeItem('fa_admin_user');
+      sessionStorage.removeItem('fa_admin_token');
+      localStorage.removeItem('fa_remember');
+      localStorage.removeItem('fa_user');
+      localStorage.removeItem('fa_token'); // secure token মুছে দাও
+      localStorage.removeItem('fa_admin_user');
+      localStorage.removeItem('fa_admin_token');
+      localStorage.removeItem('fa_admin_remember');
+      localStorage.removeItem('fa_pass');  // legacy cleanup
+
+      // Reset UI
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      document.getElementById('rememberMe').checked = false;
+      document.getElementById('headerUsername').textContent = '';
+      document.getElementById('loginBtn').disabled = false;
+      document.getElementById('loginBtnText').textContent = '🚀 Sign In';
+      clearLoginError();
+      currentCollection = null;
+      currentDocuments = [];
+      collections = [];
+      document.getElementById('contentHeader').style.display = 'none';
+      document.getElementById('contentBody').innerHTML = `<div class="welcome" id="welcomeScreen">${svgEmptyDoc}<h2>Firebase Admin Panel</h2><p>Select a collection from the sidebar or create a new one to start managing your Firestore data.</p></div>`;
+      // appContainer লুকাও, loginPage দেখাও
+      document.getElementById('appContainer').style.display = 'none';
+      const lp = document.getElementById('loginPage');
+      lp.style.display = 'flex';
+      lp.classList.remove('hide');
+    };
+
+    // Enter key support for login
+    document.getElementById('loginPassword').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doLogin();
+    });
+    document.getElementById('loginUsername').addEventListener('keydown', e => {
+      if (e.key === 'Enter') document.getElementById('loginPassword').focus();
+    });
+
+    // ── AUTO LOGIN CHECK (Multi-Device Token System) ──
+    async function checkAutoLogin() {
+      // পুরনো plaintext password entry মুছে দাও (legacy cleanup)
+      localStorage.removeItem('fa_pass');
+
+      // ── REMEMBER ME: এই device-এর token verify করো ──
+      const remember = localStorage.getItem('fa_remember');
+      const savedUser = localStorage.getItem('fa_user');
+      const savedToken = localStorage.getItem('fa_token');
+      const deviceId = getDeviceId();
+
+      if (remember && savedUser && savedToken) {
+        try {
+          const userSnap = await getDoc(doc(db, 'users', savedUser));
+
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            // Multi-device: sessions map থেকে এই device-এর entry খোঁজো
+            const sessions = data.sessions || {};
+            const deviceSession = sessions[deviceId];
+
+            if (deviceSession && deviceSession.token === savedToken && Date.now() < deviceSession.expires) {
+              // ✅ Valid token — auto login!
+              document.getElementById('loginUsername').value = savedUser;
+              document.getElementById('rememberMe').checked = true;
+              showAppPanel(savedUser);
+              return;
+            } else {
+              // Token মেলেনি বা expire হয়েছে — শুধু এই device-এর local data clear করো
+              localStorage.removeItem('fa_remember');
+              localStorage.removeItem('fa_user');
+              localStorage.removeItem('fa_token');
+            }
+          } else {
+            // User Firebase-এ নেই — সব clear করো
+            localStorage.removeItem('fa_remember');
+            localStorage.removeItem('fa_user');
+            localStorage.removeItem('fa_token');
+          }
+        } catch (_) {
+          // Network error — login page দেখাও, token নষ্ট করব না
+        }
+      }
+
+      // ── SESSION চেক (browser বন্ধ না হলে active থাকে) ──
+      const sessionUser = sessionStorage.getItem('fa_user');
+      if (sessionUser) {
+        // Session valid — Firebase verify (network error হলে allow করো)
+        try {
+          const userSnap = await getDoc(doc(db, 'users', sessionUser));
+          if (userSnap.exists()) {
+            showAppPanel(sessionUser);
+            return;
+          } else {
+            sessionStorage.removeItem('fa_user');
+            sessionStorage.removeItem('fa_token');
+          }
+        } catch (_) {
+          // Network error — session দিয়ে চালু করো
+          showAppPanel(sessionUser);
+          return;
+        }
+      }
+
+      // কেউ লগইন নেই — লগইন পেজ দেখাও
+      showLoginPage();
+    }
+
+    // Status check — Firebase server থেকে সাড়া পাওয়া গেলেই Connected
+    // (permission-denied = Connected, কারণ server সাড়া দিয়েছে)
+    // (network-unavailable = Error, কারণ server-ই reach হয়নি)
+    (async () => {
+      try {
+        await getDoc(doc(db, 'Collections', 'names'));
+        document.getElementById('statusDot').classList.add('connected');
+        document.getElementById('statusText').textContent = 'Connected';
+      } catch (e) {
+        // Firebase error codes: 'permission-denied' মানে server reach হয়েছে → Connected
+        // 'unavailable' বা 'failed-precondition' মানে network problem → Error
+        const code = e.code || '';
+        if (code === 'permission-denied' || code.includes('permission')) {
+          document.getElementById('statusDot').classList.add('connected');
+          document.getElementById('statusText').textContent = 'Connected';
+        } else {
+          document.getElementById('statusDot').classList.add('error');
+          document.getElementById('statusText').textContent = 'Error';
+        }
+      }
+    })();
+
+    // ── HELPERS ──
+    function esc(str) {
+      return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function fmtVal(v) {
+      if (v === undefined || v === null) return '<span style="color:var(--text-muted)">null</span>';
+      if (typeof v === 'boolean') return `<span style="color:var(--accent-purple)">${v}</span>`;
+      if (typeof v === 'number') return `<span style="color:var(--accent-green)">${v}</span>`;
+      if (typeof v === 'object') return '<span style="color:var(--accent-orange)">{…}</span>';
+      const s = String(v);
+      const lines = s.split('\n');
+      const isHwidFormat = s.trim().length > 0 && lines.every(line => {
+        const p = line.split('|');
+        // support 3-part (old) or 4-part (new with status)
+        return (p.length === 3 || p.length === 4) && /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/.test(p[2]);
+      });
+      if (isHwidFormat) {
+        return esc(`[HWID] ${lines.length} Entr${lines.length>1?'ies':'y'}`);
+      }
+      return esc(s.length > 55 ? s.slice(0, 55) + '…' : s);
+    }
+
+    // ── MODAL ──
+    function openModal(id) {
+      document.getElementById(id).classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    window.closeModal = closeModal;
+    window.openModal = openModal;
+
+    // Modal overlay click listener removed so modals don't close on outside click.
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.show').forEach(m => closeModal(m.id));
+      if (e.key === 'Enter' && document.getElementById('addCollectionModal').classList.contains('show')) addCollection();
+    });
+
+    // ── SIDEBAR ──
+    window.toggleSidebar = () => {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('show');
+    };
+
+    window.closeSidebar = () => {
+      if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarOverlay').classList.remove('show');
+      }
+    };
+
+    // ── TOAST ──
+    window.showToast = function (type, title, msg) {
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      const c = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `<span class="toast-icon">${icons[type] || 'ℹ️'}</span>
+      <div class="toast-msg"><strong>${esc(title)}</strong>${msg ? `<br/><span style="color:var(--text-secondary);font-size:12px">${esc(msg)}</span>` : ''}</div>
+      <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:18px;line-height:1;padding:0 2px;">✕</button>`;
+      c.appendChild(t);
+      requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
+      setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 4500);
+    };
+
+    // ── COLLECTIONS ──
+    function saveCollections() { localStorage.setItem('fireCollections', JSON.stringify(collections)); }
+
+    // Firebase-এ Collections/names ডকুমেন্টে কালেকশনের নাম যোগ করা
+    async function addCollectionNameToFirebase(name) {
+      try {
+        const ref = doc(db, 'Collections', 'names');
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          await updateDoc(ref, { list: arrayUnion(name) });
+        } else {
+          await setDoc(ref, { list: [name] });
+        }
+      } catch (e) {
+        console.warn('Firebase Collections/names update failed:', e.message);
+      }
+    }
+
+    // Firebase-এ Collections/names ডকুমেন্ট থেকে কালেকশনের নাম সরানো
+    async function removeCollectionNameFromFirebase(name) {
+      try {
+        const ref = doc(db, 'Collections', 'names');
+        await updateDoc(ref, { list: arrayRemove(name) });
+      } catch (e) {
+        console.warn('Firebase Collections/names remove failed:', e.message);
+      }
+    }
+
+    // Firebase-এ Collections/names ডকুমেন্ট থেকে সব কালেকশনের নাম পড়া
+    async function loadCollectionNamesFromFirebase() {
+      try {
+        const ref = doc(db, 'Collections', 'names');
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const data = snap.data();
+          return Array.isArray(data.list) ? data.list : [];
+        }
+      } catch (e) {
+        console.warn('Firebase Collections/names read failed:', e.message);
+      }
+      return [];
+    }
+
+    window.filterCollections = debounce(function () { renderCollections(); }, 300);
+    window.filterUserTable = debounce(function () { renderUsers(); }, 300);
+    window.filterLogTable = debounce(function () { renderLogs(); }, 300);
+
+    function renderCollections() {
+      const list = document.getElementById('collectionList');
+      const q = (document.getElementById('collectionSearch').value || '').toLowerCase();
+      const filtered = collections.filter(c => c.toLowerCase().includes(q));
+
+      if (!filtered.length) {
+        list.innerHTML = `<div class="sidebar-empty">${svgEmptyFolder}<p>${collections.length ? 'No match found.' : 'No collections yet.<br/>Click <strong>+</strong> to add one.'}</p></div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(c => {
+        const owners = collectionOwnerMap[c] || [];
+        const isAdmin = currentUserRole === 'Admin';
+        // Admin view: username label দেখাবে
+        const ownerHtml = (isAdmin && owners.length > 0)
+          ? `<span class="collection-owner-label">👤 ${owners.join(', ')}</span>`
+          : (isAdmin ? `<span class="collection-owner-label" style="color:var(--text-muted);background:rgba(74,85,104,0.12);border-color:rgba(74,85,104,0.2);">No owner</span>` : '');
+
+        return `
+        <div class="collection-item ${currentCollection === c ? 'active' : ''}" data-col="${esc(c)}" onclick="selectCollection(this.dataset.col)">
+          <span class="collection-icon">📁</span>
+          <div class="collection-item-inner">
+            <span class="collection-name">${esc(c)}</span>
+            ${ownerHtml}
+          </div>
+          <button class="collection-delete" data-col="${esc(c)}" onclick="event.stopPropagation();confirmDeleteCollection(this.dataset.col)" title="Remove">✕</button>
+        </div>
+      `;
+      }).join('');
+    }
+
+    window.openAddCollectionModal = function () {
+      document.getElementById('newCollectionId').value = '';
+      document.getElementById('collectionIdError').style.display = 'none';
+      openModal('addCollectionModal');
+      setTimeout(() => document.getElementById('newCollectionId').focus(), 100);
+    };
+
+    window.addCollection = async function () {
+      const input = document.getElementById('newCollectionId');
+      const errEl = document.getElementById('collectionIdError');
+      const val = input.value.trim();
+      errEl.style.display = 'none';
+      if (!val) { errEl.textContent = 'Collection ID cannot be empty.'; errEl.style.display = 'block'; return; }
+      if (val.includes('/')) { errEl.textContent = 'Collection ID cannot contain slashes.'; errEl.style.display = 'block'; return; }
+      if (val === 'Collections') { errEl.textContent = '"Collections" is a reserved name used internally.'; errEl.style.display = 'block'; return; }
+      if (collections.includes(val)) { errEl.textContent = 'This collection already exists.'; errEl.style.display = 'block'; return; }
+      collections.push(val);
+      saveCollections();
+      renderCollections();
+      closeModal('addCollectionModal');
+      // Firebase-এ কালেকশনের নাম সেভ করো
+      await addCollectionNameToFirebase(val);
+
+      // ── AUTO-ASSIGN: Standard user যে collection তৈরি করে সে সেটা দেখতে পাবে ──
+      // Admin-এর ক্ষেত্রে এটা দরকার নেই (Admin সব দেখে)
+      if (currentUserRole !== 'Admin' && loggedInUser) {
+        // Local state আপডেট করো
+        if (!currentUserAllowedCollections.includes(val)) {
+          currentUserAllowedCollections.push(val);
+        }
+        // Firebase-এ user-এর allowed_collections আপডেট করো
+        try {
+          await updateDoc(doc(db, 'users', loggedInUser), {
+            allowed_collections: currentUserAllowedCollections
+          });
+        } catch (e) {
+          // যদি doc না থাকে (setDoc দিয়ে try করো)
+          try {
+            await setDoc(doc(db, 'users', loggedInUser), {
+              allowed_collections: currentUserAllowedCollections
+            }, { merge: true });
+          } catch (_) {}
+        }
+      }
+
+      showToast('success', 'Collection added!', `"${val}" is ready and saved to Firebase.`);
+      selectCollection(val);
+    };
+
+    async function removeCollectionFromAllUsers(colId) {
+      try {
+        const usersSnap = await getDocs(collection(db, 'users'));
+        const updates = usersSnap.docs.map(async (uDoc) => {
+          const data = uDoc.data();
+          if (data.allowed_collections && data.allowed_collections.includes(colId)) {
+            return updateDoc(doc(db, 'users', uDoc.id), { allowed_collections: arrayRemove(colId) });
+          }
+        });
+        await Promise.all(updates.filter(Boolean));
+      } catch (e) {
+        console.warn('Failed to remove collection from users:', e.message);
+      }
+    }
+
+    window.confirmDeleteCollection = function (colId) {
+      document.getElementById('confirmMessage').textContent = `Delete collection "${colId}" and ALL its documents from real-time Firebase server? This cannot be undone.`;
+      confirmCallback = async () => {
+        try {
+          showToast('info', 'Deleting Collection…', `Deleting all documents in "${colId}" from Firebase server…`);
+          const snap = await getDocs(collection(db, colId));
+          await Promise.all(snap.docs.map(d => deleteDoc(doc(db, colId, d.id))));
+
+          collections = collections.filter(c => c !== colId);
+          saveCollections();
+          await removeCollectionNameFromFirebase(colId);
+          await removeCollectionFromAllUsers(colId);
+          
+          if (currentCollection === colId) {
+            currentCollection = null;
+            document.getElementById('contentHeader').style.display = 'none';
+            document.getElementById('contentBody').innerHTML = `<div class="welcome">${svgEmptyDoc}<h2>Firebase Admin Panel</h2><p>Select a collection from the sidebar.</p></div>`;
+          }
+          renderCollections();
+          closeModal('confirmModal');
+          showToast('success', 'Collection Deleted!', `"${colId}" and all its documents were deleted from Firebase server.`);
+          await fetchFirestoreCollections();
+        } catch (e) {
+          showToast('error', 'Delete Failed', e.message);
+          closeModal('confirmModal');
+        }
+      };
+      openModal('confirmModal');
+    };
+
+    document.getElementById('confirmBtn').onclick = () => { if (confirmCallback) confirmCallback(); };
+
+    // ── DOCUMENTS ──
+    window.selectCollection = async function (colId) {
+      currentCollection = colId;
+      closeSidebar();
+      document.getElementById('contentHeader').style.display = 'flex';
+      document.getElementById('breadcrumbCollection').textContent = colId;
+      renderCollections();
+      await loadDocuments();
+    };
+
+    window.refreshDocuments = function () { loadDocuments(); };
+
+    let unsubscribeDocuments = null;
+
+    async function loadDocuments() {
+      const body = document.getElementById('contentBody');
+      
+      let skelRows = '';
+      for(let i=0; i<3; i++) {
+        skelRows += `<tr>
+          <td style="padding:16px;"><div class="skeleton skeleton-text" style="width:70%;margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton skeleton-text short" style="margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton skeleton-text" style="width:50%;margin:0;"></div></td>
+          <td style="padding:16px;text-align:right;"><div class="skeleton skeleton-text short" style="margin:0 0 0 auto;"></div></td>
+        </tr>`;
+      }
+      
+      body.innerHTML = `
+      <div class="stats-bar">
+        <div class="stat-card" style="pointer-events:none;"><div class="skeleton skeleton-avatar"></div><div style="flex:1"><div class="skeleton skeleton-text" style="margin:0;width:40px;"></div><div class="skeleton skeleton-text short" style="margin-top:4px;"></div></div></div>
+        <div class="stat-card" style="pointer-events:none;"><div class="skeleton skeleton-avatar"></div><div style="flex:1"><div class="skeleton skeleton-text" style="margin:0;width:40px;"></div><div class="skeleton skeleton-text short" style="margin-top:4px;"></div></div></div>
+      </div>
+      <div class="table-container">
+        <div class="table-toolbar">
+          <div class="skeleton skeleton-text" style="width:150px;margin:0;"></div>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr><th>ID</th><th>Field 1</th><th>Field 2</th><th style="text-align:right;">Actions</th></tr>
+            </thead>
+            <tbody>${skelRows}</tbody>
+          </table>
+        </div>
+      </div>
+      `;
+      
+      if (unsubscribeDocuments) {
+        unsubscribeDocuments();
+        unsubscribeDocuments = null;
+      }
+      
+      try {
+        unsubscribeDocuments = onSnapshot(collection(db, currentCollection), (snap) => {
+          currentDocuments = snap.docs
+            .map(d => ({ id: d.id, data: d.data() }))
+            .filter(d => !d.id.startsWith('_notepad_') && d.data.is_notepad_doc !== true);
+          renderDocuments();
+        }, (e) => {
+          body.innerHTML = `<div class="empty-state">${svgLock}<h3>Error</h3><p>${esc(e.message)}</p></div>`;
+          showToast('error', 'Load Failed', e.message);
+        });
+      } catch (e) {
+        body.innerHTML = `<div class="empty-state">${svgLock}<h3>Error</h3><p>${esc(e.message)}</p></div>`;
+        showToast('error', 'Load Failed', e.message);
+      }
+    }
+
+    function renderDocuments() {
+      const docs = currentDocuments;
+      const body = document.getElementById('contentBody');
+      const fields = new Set();
+      docs.forEach(d => Object.keys(d.data).forEach(k => fields.add(k)));
+      const fieldArr = [...fields].slice(0, 4);
+
+      body.innerHTML = `
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(79,142,247,0.12)">📄</div>
+          <div class="stat-info"><div class="stat-value">${docs.length}</div><div class="stat-label">Documents</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(168,85,247,0.12)">🏷</div>
+          <div class="stat-info"><div class="stat-value">${fields.size}</div><div class="stat-label">Unique Fields</div></div>
+        </div>
+      </div>
+      <div class="table-container">
+        <div class="table-toolbar">
+          <span class="table-title">📄 <strong>${esc(currentCollection)}</strong></span>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-secondary btn-sm" onclick="openNotepadModal()" title="Open Collection Notepad">📝 Notepad</button>
+            <button class="btn btn-primary btn-sm" onclick="openAddDocumentModal()">+ Add Document</button>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          ${docs.length === 0
+          ? `<div class="empty-state">${svgEmptyDoc}<h3>No documents yet</h3><p>Add a document to get started.</p></div>`
+          : `<table>
+                <thead><tr>
+                  <th>#</th>
+                  <th>Document ID</th>
+                  ${fieldArr.map(f => `<th>${esc(f)}</th>`).join('')}
+                  <th>Actions</th>
+                </tr></thead>
+                <tbody>
+                  ${docs.map((d, i) => `
+                    <tr onclick="viewDocument('${esc(d.id)}')">
+                      <td style="color:var(--text-muted);font-size:12px">${i + 1}</td>
+                      <td><div class="doc-id">🔑 ${esc(d.id)}</div></td>
+                      ${fieldArr.map(f => `<td><div class="field-preview">${fmtVal(d.data[f])}</div></td>`).join('')}
+                      <td onclick="event.stopPropagation()">
+                        <div class="row-actions">
+                          <button class="btn btn-ghost btn-sm" onclick="viewDocument('${esc(d.id)}')" title="View">👁</button>
+                          <button class="btn btn-secondary btn-sm" onclick="editDocument('${esc(d.id)}')" title="Edit">✏️</button>
+                          <button class="btn btn-danger btn-sm" onclick="confirmDeleteDocument('${esc(d.id)}')" title="Delete">🗑</button>
+                        </div>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>`
+        }
+        </div>
+      </div>
+    `;
+    }
+
+    // ── VIEW ──
+    function getTypeTag(val) {
+      if (val === null || val === undefined) return 'null';
+      if (Array.isArray(val)) return 'Array';
+      if (typeof val === 'object') return 'Object';
+      if (typeof val === 'boolean') return 'Boolean';
+      if (typeof val === 'number') return 'Number';
+      return 'Text';
+    }
+
+    function formatReadableValue(v) {
+      if (v === undefined || v === null) return '<span style="color:var(--text-muted);font-style:italic;">null</span>';
+      if (typeof v === 'boolean') return `<span style="color:var(--accent-purple);font-weight:600;">${v ? 'True' : 'False'}</span>`;
+      if (typeof v === 'number') return `<span style="color:var(--accent-green);font-weight:600;">${v}</span>`;
+      if (typeof v === 'object') {
+        try {
+          return `<pre style="font-family:'Courier New',monospace;font-size:13px;color:var(--accent-orange);margin:0;white-space:pre-wrap;">${esc(JSON.stringify(v, null, 2))}</pre>`;
+        } catch (_) {
+          return esc(String(v));
+        }
+      }
+      const str = String(v);
+      if (!str.trim()) return '<span style="color:var(--text-muted);font-style:italic;">(Empty string)</span>';
+      
+      const lines = str.split('\n');
+      const isHwidFormat = str.trim().length > 0 && lines.every(line => {
+        const p = line.split('|');
+        // support 3-part (old) or 4-part (new with status)
+        return (p.length === 3 || p.length === 4) && /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/.test(p[2]);
+      });
+      
+      if (isHwidFormat) {
+        return `<div style="display:flex;flex-direction:column;gap:12px;">` + lines.map(line => {
+          const parts = line.split('|');
+          let niceDate = parts[2].split('T')[0];
+          const statusVal = (parts[3] || 'on').toLowerCase();
+          const isOn = statusVal === 'on';
+          let isExpired = false;
+          if (niceDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const expD = new Date(niceDate);
+            expD.setHours(0, 0, 0, 0);
+            if (expD < today) {
+              isExpired = true;
+            }
+          }
+          const bgStyle = isExpired ? 'background:rgba(239, 68, 68, 0.15); border-color:rgba(239, 68, 68, 0.3);' : '';
+          const statusBadge = isOn
+            ? `<span style="display:inline-block;background:rgba(16,185,129,0.18);color:#10b981;border:1px solid rgba(16,185,129,0.4);border-radius:99px;padding:2px 12px;font-size:12px;font-weight:700;letter-spacing:0.5px;">● ON</span>`
+            : `<span style="display:inline-block;background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.35);border-radius:99px;padding:2px 12px;font-size:12px;font-weight:700;letter-spacing:0.5px;">● OFF</span>`;
+          
+          return `<div style="display:flex;gap:20px;padding:12px 15px;border:1px solid var(--border);border-radius:var(--radius-sm);${bgStyle}">
+                    <div style="flex:1.5;overflow:hidden;text-overflow:ellipsis;"><strong style="color:var(--accent-green);font-size:14px;">HWID:</strong><br/><span style="font-size:15px;line-height:1.6;display:inline-block;margin-top:4px;">${esc(parts[0])}</span></div>
+                    <div style="flex:1;overflow:hidden;text-overflow:ellipsis;"><strong style="color:var(--accent-purple);font-size:14px;">Name:</strong><br/><span style="font-size:15px;line-height:1.6;display:inline-block;margin-top:4px;">${esc(parts[1])}</span></div>
+                    <div style="flex:1;"><strong style="color:var(--accent-orange);font-size:14px;">Expiry:</strong><br/><span style="font-size:15px;line-height:1.6;display:inline-block;margin-top:4px;">${esc(niceDate)}</span></div>
+                    <div style="flex:0 0 auto;min-width:70px;text-align:center;"><strong style="color:var(--text-secondary);font-size:14px;">Status:</strong><br/><span style="display:inline-block;margin-top:6px;">${statusBadge}</span></div>
+                  </div>`;
+        }).join('') + `</div>`;
+      }
+      
+      return esc(str);
+    }
+
+    function renderReadableDoc(data) {
+      const el = document.getElementById('viewDocReadable');
+      if (!data || typeof data !== 'object') {
+        el.innerHTML = `<div class="readable-value-box">${formatReadableValue(data)}</div>`;
+        return;
+      }
+      const entries = Object.entries(data);
+      if (entries.length === 0) {
+        el.innerHTML = `<div style="color:var(--text-muted);font-style:italic;padding:12px 0;">Document is empty</div>`;
+        return;
+      }
+      // Simple mode or single data field: show cleanly formatted text directly without JSON syntax
+      if (entries.length === 1 && ['data', 'value', 'text', 'content'].includes(entries[0][0])) {
+        el.innerHTML = `<div class="readable-value-box">${formatReadableValue(entries[0][1])}</div>`;
+        return;
+      }
+      // Multiple fields or custom field keys: show readable key-value cards
+      el.innerHTML = `
+      <div class="readable-fields-list">
+        ${entries.map(([k, v]) => `
+          <div class="readable-field-item">
+            <div class="readable-field-label">
+              <span class="field-badge">${esc(k)}</span>
+              <span class="field-type-tag">${getTypeTag(v)}</span>
+            </div>
+            <div class="readable-field-val">${formatReadableValue(v)}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    }
+
+    window.switchViewMode = function (mode) {
+      const readableEl = document.getElementById('viewDocReadable');
+      const jsonEl = document.getElementById('viewDocJson');
+      const btnReadable = document.getElementById('btnViewModeReadable');
+      const btnJson = document.getElementById('btnViewModeJson');
+
+      if (mode === 'readable') {
+        readableEl.style.display = 'block';
+        jsonEl.style.display = 'none';
+        btnReadable.classList.add('active');
+        btnJson.classList.remove('active');
+      } else {
+        readableEl.style.display = 'none';
+        jsonEl.style.display = 'block';
+        btnReadable.classList.remove('active');
+        btnJson.classList.add('active');
+      }
+    };
+
+    window.viewDocument = function (docId) {
+      const d = currentDocuments.find(x => x.id === docId);
+      if (!d) return;
+      document.getElementById('viewDocTitle').textContent = 'Document View';
+      document.getElementById('viewDocId').textContent = docId;
+
+      renderReadableDoc(d.data);
+      document.getElementById('viewDocJson').textContent = JSON.stringify(d.data, null, 2);
+      switchViewMode('readable');
+
+      document.getElementById('viewDocEditBtn').onclick = () => { closeModal('viewDocModal'); editDocument(docId); };
+      document.getElementById('viewDocDeleteBtn').onclick = () => { closeModal('viewDocModal'); confirmDeleteDocument(docId); };
+      openModal('viewDocModal');
+    };
+
+    window.toggleDocType = function() {
+      const isHwid = document.querySelector('input[name="docType"]:checked').value === 'hwid';
+      document.getElementById('normalDocFields').style.display = isHwid ? 'none' : 'block';
+      document.getElementById('hwidDocFields').style.display = isHwid ? 'block' : 'none';
+    };
+
+    window.addHwidRow = function(id = '', name = '', date = '', status = 'on') {
+      if (!date) {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        date = now.toISOString().split('T')[0];
+      }
+      const safeStatus = (status === 'off') ? 'off' : 'on';
+      const div = document.createElement('div');
+      div.style.display = 'flex';
+      div.style.gap = '10px';
+      div.style.alignItems = 'center';
+      div.innerHTML = `
+        <input type="text" class="form-control hwid-id" placeholder="HWID" value="${esc(id)}" style="flex:2;" />
+        <input type="text" class="form-control hwid-name" placeholder="Name" value="${esc(name)}" style="flex:2;" />
+        <input type="date" class="form-control hwid-date" value="${esc(date)}" style="flex:1.2;" />
+        <div style="flex:0 0 auto;display:flex;flex-direction:column;gap:3px;">
+          <span style="font-size:11px;color:var(--text-secondary);font-weight:600;text-align:center;">Status</span>
+          <select class="select-control hwid-status" style="min-width:80px;font-weight:700;color:${safeStatus==='on'?'var(--accent-green)':'var(--accent-red)'};" onchange="this.style.color=this.value==='on'?'var(--accent-green)':'var(--accent-red)'">
+            <option value="on" ${safeStatus==='on'?'selected':''}>ON</option>
+            <option value="off" ${safeStatus==='off'?'selected':''}>OFF</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-ghost" onclick="this.parentElement.remove()" style="padding:0 10px;color:var(--accent-red);">✕</button>
+      `;
+      document.getElementById('hwidRowsContainer').appendChild(div);
+    };
+
+    // ── ADD DOC (simple mode: only Document ID + Value textarea) ──
+    window.openAddDocumentModal = function () {
+      editingDocId = null;
+      window._editingFieldKey = 'data';
+      document.getElementById('docModalTitle').textContent = 'Add Document';
+      document.getElementById('docModalIcon').textContent = '📄';
+      
+      // Add Document mode: show Document Type selector
+      document.getElementById('docTypeSection').style.display = 'block';
+      
+      const normalRadio = document.querySelector('input[name="docType"][value="normal"]');
+      if (normalRadio) normalRadio.checked = true;
+      toggleDocType();
+      
+      document.getElementById('docIdInput').value = '';
+      document.getElementById('docIdInput').disabled = false;
+      document.getElementById('simpleValueWrap').style.display = 'block';
+      document.getElementById('simpleValueInput').value = '';
+      
+      document.getElementById('hwidRowsContainer').innerHTML = '';
+      addHwidRow();
+      
+      document.getElementById('fieldsEditor').style.display = 'none';
+      document.getElementById('fieldsEditor').innerHTML = '';
+      openModal('documentModal');
+      setTimeout(() => document.getElementById('simpleValueInput').focus(), 120);
+    };
+
+    // ── EDIT DOC (simple mode: ONLY Document ID + Value textarea, just like Add Document!) ──
+    window.editDocument = function (docId) {
+      const d = currentDocuments.find(x => x.id === docId);
+      if (!d) return;
+      editingDocId = docId;
+      // Determine which field key to edit (default 'data', or first field name in document)
+      window._editingFieldKey = ('data' in d.data) ? 'data' : (Object.keys(d.data)[0] || 'data');
+      const valObj = d.data[window._editingFieldKey];
+      const strVal = (valObj !== null && typeof valObj === 'object') ? JSON.stringify(valObj, null, 2) : String(valObj ?? '');
+
+      document.getElementById('docModalTitle').textContent = 'Edit Document';
+      document.getElementById('docModalIcon').textContent = '✏️';
+      
+      const strValStr = typeof valObj === 'string' ? valObj : '';
+      const lines = strValStr.split('\n');
+      const isHwidFormat = strValStr.trim().length > 0 && lines.every(line => {
+        const p = line.split('|');
+        // support 3-part (old) or 4-part (new with status)
+        return (p.length === 3 || p.length === 4) && /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/.test(p[2]);
+      });
+      
+      if (isHwidFormat) {
+        // HWID format detected: hide docType radio selector, show HWID fields directly
+        document.getElementById('docTypeSection').style.display = 'none';
+        document.querySelector('input[name="docType"][value="hwid"]').checked = true;
+        document.getElementById('hwidRowsContainer').innerHTML = '';
+        lines.forEach(line => {
+          const parts = line.split('|');
+          const statusPart = parts[3] ? parts[3].toLowerCase() : 'on';
+          addHwidRow(parts[0], parts[1], parts[2].split('T')[0], statusPart);
+        });
+      } else {
+        // Normal document: hide docType radio selector entirely
+        document.getElementById('docTypeSection').style.display = 'none';
+        document.querySelector('input[name="docType"][value="normal"]').checked = true;
+      }
+      toggleDocType();
+
+      document.getElementById('docIdInput').value = docId;
+      document.getElementById('docIdInput').disabled = true;
+      document.getElementById('simpleValueWrap').style.display = 'block';
+      document.getElementById('simpleValueInput').value = strVal;
+      document.getElementById('fieldsEditor').style.display = 'none';
+      document.getElementById('fieldsEditor').innerHTML = '';
+      openModal('documentModal');
+      if (!isHwidFormat) {
+        setTimeout(() => document.getElementById('simpleValueInput').focus(), 120);
+      }
+    };
+
+    // ── SAVE ──
+    // Smart type parser: number, boolean, JSON object/array অটো-detect করো
+    function parseSmartValue(val) {
+      const trimmed = val.trim();
+      if (trimmed === 'true') return true;
+      if (trimmed === 'false') return false;
+      if (trimmed === 'null') return null;
+      if (trimmed !== '' && !isNaN(Number(trimmed))) return Number(trimmed);
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (typeof parsed === 'object' || Array.isArray(parsed)) return parsed;
+      } catch (_) { }
+      return val; // default: string
+    }
+
+    window.saveDocument = async function () {
+      const data = {};
+      const fieldKey = window._editingFieldKey || 'data';
+      
+      const isHwid = document.querySelector('input[name="docType"]:checked').value === 'hwid';
+      if (isHwid) {
+        const rows = document.querySelectorAll('#hwidRowsContainer > div');
+        const lines = [];
+        rows.forEach(row => {
+          const id = row.querySelector('.hwid-id').value.trim();
+          const name = row.querySelector('.hwid-name').value.trim();
+          const date = row.querySelector('.hwid-date').value;
+          const statusEl = row.querySelector('.hwid-status');
+          const status = statusEl ? statusEl.value : 'on';
+          if (id || name) {
+            lines.push(`${id}|${name}|${date}|${status}`);
+          }
+        });
+        data[fieldKey] = lines.join('\n');
+      } else {
+        const rawVal = document.getElementById('simpleValueInput').value;
+        data[fieldKey] = parseSmartValue(rawVal);
+      }
+
+      const btn = document.getElementById('docModalSaveBtn');
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;display:inline-block;"></span> Saving…';
+      btn.disabled = true;
+
+      try {
+        if (editingDocId) {
+          await setDoc(doc(db, currentCollection, editingDocId), data);
+          await logSystemActivity('UPDATE_DOC', `${currentCollection}/${editingDocId}`, `Updated document in collection ${currentCollection}`);
+          showToast('success', 'Document updated!', `"${editingDocId}" saved.`);
+        } else {
+          const customId = document.getElementById('docIdInput').value.trim();
+          if (customId) {
+            await setDoc(doc(db, currentCollection, customId), data);
+            await logSystemActivity('CREATE_DOC', `${currentCollection}/${customId}`, `Created document with custom ID in ${currentCollection}`);
+            showToast('success', 'Document created!', `"${customId}" added.`);
+          } else {
+            const resDoc = await addDoc(collection(db, currentCollection), data);
+            await logSystemActivity('CREATE_DOC', `${currentCollection}/${resDoc.id}`, `Created document in ${currentCollection}`);
+            showToast('success', 'Document created!', 'New document added.');
+          }
+        }
+        closeModal('documentModal');
+        await loadDocuments();
+      } catch (e) {
+        showToast('error', 'Save Failed', e.message);
+      } finally {
+        btn.innerHTML = orig;
+        btn.disabled = false;
+      }
+    };
+
+    // ── DELETE DOC ──
+    window.confirmDeleteDocument = function (docId) {
+      document.getElementById('confirmMessage').textContent = `Delete document "${docId}"? This cannot be undone.`;
+      confirmCallback = async () => {
+        try {
+          await deleteDoc(doc(db, currentCollection, docId));
+          await logSystemActivity('DELETE_DOC', `${currentCollection}/${docId}`, `Deleted document from collection ${currentCollection}`);
+          showToast('success', 'Deleted!', `"${docId}" removed.`);
+          closeModal('confirmModal');
+          await loadDocuments();
+          fetchFirestoreCollections();
+        } catch (e) {
+          showToast('error', 'Delete Failed', e.message);
+        }
+      };
+      openModal('confirmModal');
+    };
+
+    // ── AUTO-LOAD EXISTING FIRESTORE COLLECTIONS (FIREBASE Collections/names ডকুমেন্ট থেকে) ──
+    async function fetchFirestoreCollections() {
+      const listEl = document.getElementById('collectionList');
+      
+      // Skeleton Loader for Sidebar
+      let skeletonHtml = '';
+      for(let i=0; i<5; i++) {
+        skeletonHtml += `
+          <div class="collection-item" style="pointer-events:none; border:none;">
+            <div class="skeleton skeleton-avatar"></div>
+            <div class="skeleton skeleton-text short" style="width: ${Math.random() * 40 + 40}%;"></div>
+          </div>`;
+      }
+      listEl.innerHTML = skeletonHtml;
+
+      // প্রথমে Firebase Collections/names ডকুমেন্ট থেকে পড়ো
+      const firebaseNames = await loadCollectionNamesFromFirebase();
+
+      // localStorage থেকে পুরনো কালেকশন (backward compatibility)
+      const saved = JSON.parse(localStorage.getItem('fireCollections') || '[]');
+
+      // সব মিলিয়ে unique candidates তৈরি করো
+      const candidates = Array.from(new Set([...firebaseNames, ...saved]));
+
+      if (candidates.length === 0) {
+        // যদি কোনো নাম না পাওয়া যায়, খালি দেখাও
+        collections = [];
+        saveCollections();
+        renderCollections();
+        return;
+      }
+
+      // প্রতিটি candidate Firebase-এ আসলে আছে কিনা যাচাই করো
+      const verifyResults = await Promise.all(candidates.map(async c => {
+        if (c === 'Collections') return null; // internal collection বাদ দাও
+        try {
+          const q = query(collection(db, c), limit(1));
+          await getDocs(q);
+          return c; // verified
+        } catch (_) {
+          return null;
+        }
+      }));
+      const existing = verifyResults.filter(Boolean);
+
+      // Firebase Collections/names-এ registered নামগুলো সরাসরি নাও (empty collection-ও valid)
+      let finalList = Array.from(new Set([...firebaseNames.filter(n => n !== 'Collections'), ...existing])).sort();
+
+      // ── PER-USER COLLECTION ACCESS CONTROL ──
+      // Admin সব দেখবে; Standard user শুধু allowed_collections দেখবে
+      if (currentUserRole !== 'Admin' && currentUserAllowedCollections.length > 0) {
+        finalList = finalList.filter(c => currentUserAllowedCollections.includes(c));
+      } else if (currentUserRole !== 'Admin' && currentUserAllowedCollections.length === 0) {
+        // Standard user-এর কোনো collection assign করা নেই → খালি দেখাও
+        collections = [];
+        saveCollections();
+        listEl.innerHTML = `<div class="sidebar-empty">${svgLock}<p>No collections assigned to your account.<br/>Please contact Admin.</p></div>`;
+        return;
+      }
+
+      // ── ADMIN: collection সে owner (username) map তৈরি করো ──
+      // সব user-এর allowed_collections পড়ে map তৈরি করো: { colName: [user1, user2] }
+      if (currentUserRole === 'Admin') {
+        try {
+          collectionOwnerMap = {}; // reset
+          const usersSnap = await getDocs(collection(db, 'users'));
+          usersSnap.docs.forEach(d => {
+            const data = d.data();
+            const username = d.id;
+            const uRole = (data.role || '').toLowerCase();
+            const isAdminUser = (uRole === 'admin' || uRole === 'admin access' || uRole === 'administrator');
+            if (isAdminUser) return; // Admin user-দের skip করো
+            const cols = Array.isArray(data.allowed_collections) ? data.allowed_collections : [];
+            cols.forEach(colName => {
+              if (!collectionOwnerMap[colName]) collectionOwnerMap[colName] = [];
+              if (!collectionOwnerMap[colName].includes(username)) {
+                collectionOwnerMap[colName].push(username);
+              }
+            });
+          });
+        } catch (e) {
+          console.warn('Could not build collection owner map:', e.message);
+        }
+      }
+
+      collections = finalList;
+      saveCollections();
+
+      // Firebase Collections/names sync করো (Admin হলেই sync করবে)
+      if (currentUserRole === 'Admin') {
+        for (const name of saved) {
+          if (name !== 'Collections' && !firebaseNames.includes(name)) {
+            await addCollectionNameToFirebase(name);
+          }
+        }
+      }
+
+      renderCollections();
+    }
+
+    // ── COLLECTION NOTEPAD SYSTEM ──
+    window.openNotepadModal = async function () {
+      if (!currentCollection) {
+        showToast('error', 'No Collection Selected', 'Please select a collection first from the sidebar.');
+        return;
+      }
+      document.getElementById('notepadStatusText').textContent = '💡 Ctrl+S to save';
+      openModal('notepadModal');
+      await refreshNotepadDropdown();
+    };
+
+    async function refreshNotepadDropdown(preferredDocId = null) {
+      const selectEl = document.getElementById('notepadDocSelect');
+      selectEl.innerHTML = '<option value="">Loading notes...</option>';
+
+      try {
+        // কালেকশনের ভেতর থেকে নোটপ্যাড ডকুমেন্টগুলো খুঁজে বের করো
+        const snap = await getDocs(collection(db, currentCollection));
+        const noteDocs = [];
+        snap.docs.forEach(d => {
+          const data = d.data();
+          if (d.id.startsWith('_notepad_') || data.is_notepad_doc === true) {
+            noteDocs.push({
+              id: d.id,
+              title: data.title || d.id,
+              content: data.content || ''
+            });
+          }
+        });
+
+        if (noteDocs.length === 0) {
+          // কোনো নোট না থাকলে একটি ডিফল্ট নোট তৈরি করো
+          const defaultId = '_notepad_default';
+          const defaultTitle = 'General Notepad';
+          await setDoc(doc(db, currentCollection, defaultId), {
+            is_notepad_doc: true,
+            title: defaultTitle,
+            content: '',
+            updated_at: new Date().toISOString()
+          });
+          noteDocs.push({ id: defaultId, title: defaultTitle, content: '' });
+        }
+
+        selectEl.innerHTML = noteDocs.map(n => `
+        <option value="${esc(n.id)}">${esc(n.title)}</option>
+      `).join('');
+
+        const targetId = preferredDocId && noteDocs.some(n => n.id === preferredDocId)
+          ? preferredDocId
+          : noteDocs[0].id;
+
+        selectEl.value = targetId;
+        await window.switchNotepadDocument(targetId, noteDocs);
+      } catch (e) {
+        selectEl.innerHTML = '<option value="">Error loading notes</option>';
+        showToast('error', 'Notepad Error', e.message);
+      }
+    }
+
+    window.switchNotepadDocument = async function (docId, preloadedNotes = null) {
+      if (!docId) return;
+      currentNotepadId = docId;
+
+      try {
+        let data = null;
+        if (preloadedNotes) {
+          const found = preloadedNotes.find(n => n.id === docId);
+          if (found) data = found;
+        }
+        if (!data) {
+          const snap = await getDoc(doc(db, currentCollection, docId));
+          if (snap.exists()) {
+            data = snap.data();
+          }
+        }
+
+        document.getElementById('notepadTitleInput').value = (data && data.title) ? data.title : docId;
+        document.getElementById('notepadContentInput').value = (data && data.content) ? data.content : '';
+        document.getElementById('notepadStatusText').textContent = '💡 Ready (Ctrl+S to save)';
+      } catch (e) {
+        showToast('error', 'Error Loading Note', e.message);
+      }
+    };
+
+    window.createNewNotepad = async function () {
+      if (!currentCollection) return;
+      const timestamp = Date.now();
+      const newId = `_notepad_${timestamp}`;
+      const newTitle = `New Note ${new Date().toLocaleDateString()}`;
+
+      try {
+        await setDoc(doc(db, currentCollection, newId), {
+          is_notepad_doc: true,
+          title: newTitle,
+          content: '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+        showToast('success', 'New Notepad Created', `Note "${newTitle}" created.`);
+        await logSystemActivity('CREATE_NOTE', `${currentCollection}/${newId}`, `Created note "${newTitle}"`);
+        await refreshNotepadDropdown(newId);
+        document.getElementById('notepadContentInput').focus();
+      } catch (e) {
+        showToast('error', 'Create Failed', e.message);
+      }
+    };
+
+    window.saveCurrentNotepad = async function () {
+      if (!currentCollection || !currentNotepadId) return;
+      const titleVal = document.getElementById('notepadTitleInput').value.trim() || currentNotepadId;
+      const contentVal = document.getElementById('notepadContentInput').value;
+
+      const saveBtn = document.getElementById('notepadSaveBtn');
+      const origHtml = saveBtn.innerHTML;
+      saveBtn.innerHTML = '⏳ Saving...';
+      saveBtn.disabled = true;
+
+      try {
+        await setDoc(doc(db, currentCollection, currentNotepadId), {
+          is_notepad_doc: true,
+          title: titleVal,
+          content: contentVal,
+          updated_at: new Date().toISOString()
+        }, { merge: true });
+
+        const selectEl = document.getElementById('notepadDocSelect');
+        const opt = selectEl.querySelector(`option[value="${CSS.escape(currentNotepadId)}"]`);
+        if (opt) {
+          opt.textContent = titleVal;
+        }
+
+        document.getElementById('notepadStatusText').textContent = '✅ Saved at ' + new Date().toLocaleTimeString();
+        showToast('success', 'Notepad Saved!', `Note "${titleVal}" saved successfully.`);
+        await logSystemActivity('SAVE_NOTE', `${currentCollection}/${currentNotepadId}`, `Saved note "${titleVal}"`);
+        await loadDocuments(); // মূল ডকুমেন্টস টেবিল সিঙ্ক করার জন্য
+      } catch (e) {
+        showToast('error', 'Save Failed', e.message);
+        document.getElementById('notepadStatusText').textContent = '❌ Error saving note';
+      } finally {
+        saveBtn.innerHTML = origHtml;
+        saveBtn.disabled = false;
+      }
+    };
+
+    window.deleteCurrentNotepad = function () {
+      if (!currentCollection || !currentNotepadId) return;
+      const titleVal = document.getElementById('notepadTitleInput').value.trim() || currentNotepadId;
+      document.getElementById('confirmMessage').textContent = `Are you sure you want to delete note "${titleVal}" (${currentNotepadId}) from collection "${currentCollection}"?`;
+      confirmCallback = async () => {
+        try {
+          await deleteDoc(doc(db, currentCollection, currentNotepadId));
+          await logSystemActivity('DELETE_NOTE', `${currentCollection}/${currentNotepadId}`, `Deleted note "${titleVal}"`);
+          showToast('success', 'Note Deleted', `Note "${titleVal}" deleted.`);
+          closeModal('confirmModal');
+          await refreshNotepadDropdown();
+          await loadDocuments();
+        } catch (e) {
+          showToast('error', 'Delete Failed', e.message);
+        }
+      };
+      openModal('confirmModal');
+    };
+
+    // Ctrl+S / Cmd+S কিবোর্ড শর্টকাট নোটপ্যাড সেভ করার জন্য
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        const notepadModal = document.getElementById('notepadModal');
+        if (notepadModal && notepadModal.classList.contains('show')) {
+          e.preventDefault();
+          window.saveCurrentNotepad();
+        }
+      }
+    });
+
+    // ── THEME CUSTOMIZER SYSTEM ──
+    let currentTheme = {
+      mode: 'dark',
+      accent: 'blue',
+      sidebarWidth: 280
+    };
+
+    function loadThemeSettings() {
+      try {
+        const saved = localStorage.getItem('fa_theme_settings');
+        if (saved) {
+          currentTheme = Object.assign(currentTheme, JSON.parse(saved));
+        }
+      } catch (_) { }
+      applyThemeSettings();
+    }
+
+    function saveThemeSettings() {
+      try {
+        localStorage.setItem('fa_theme_settings', JSON.stringify(currentTheme));
+      } catch (_) { }
+    }
+
+    function applyThemeSettings() {
+      // Mode
+      document.body.classList.remove('theme-light');
+      if (currentTheme.mode === 'light') {
+        document.body.classList.add('theme-light');
+      }
+
+      // Accent
+      document.body.classList.remove('theme-purple', 'theme-green', 'theme-orange');
+      if (currentTheme.accent !== 'blue') {
+        document.body.classList.add(`theme-${currentTheme.accent}`);
+      }
+
+      // Sidebar Width
+      document.documentElement.style.setProperty('--sidebar-width', `${currentTheme.sidebarWidth}px`);
+
+      // Update active button classes in Modal
+      document.querySelectorAll('#themeModal .theme-btn').forEach(btn => btn.classList.remove('active'));
+      const modeBtn = document.getElementById(currentTheme.mode === 'dark' ? 'btnModeDark' : 'btnModeLight');
+      if (modeBtn) modeBtn.classList.add('active');
+
+      const accentBtn = document.getElementById(
+        currentTheme.accent === 'purple' ? 'btnAccentPurple' :
+          currentTheme.accent === 'green' ? 'btnAccentGreen' :
+            currentTheme.accent === 'orange' ? 'btnAccentOrange' : 'btnAccentBlue'
+      );
+      if (accentBtn) accentBtn.classList.add('active');
+
+      const widthBtn = document.getElementById(
+        currentTheme.sidebarWidth === 220 ? 'btnWidthCompact' :
+          currentTheme.sidebarWidth === 340 ? 'btnWidthWide' : 'btnWidthNormal'
+      );
+      if (widthBtn) widthBtn.classList.add('active');
+    }
+
+    window.openThemeModal = function () {
+      applyThemeSettings();
+      openModal('themeModal');
+    };
+
+    window.setThemeMode = function (mode) {
+      currentTheme.mode = mode;
+      saveThemeSettings();
+      applyThemeSettings();
+      showToast('info', 'Theme Updated', `${mode === 'light' ? 'Light' : 'Dark'} mode applied.`);
+    };
+
+    window.setThemeAccent = function (accent) {
+      currentTheme.accent = accent;
+      saveThemeSettings();
+      applyThemeSettings();
+      showToast('info', 'Accent Updated', `${accent.charAt(0).toUpperCase() + accent.slice(1)} accent applied.`);
+    };
+
+    window.setSidebarWidth = function (width) {
+      currentTheme.sidebarWidth = width;
+      saveThemeSettings();
+      applyThemeSettings();
+      showToast('info', 'Sidebar Adjusted', `Sidebar width set to ${width}px.`);
+    };
+
+    window.resetThemeSettings = function () {
+      currentTheme = { mode: 'dark', accent: 'blue', sidebarWidth: 280 };
+      saveThemeSettings();
+      applyThemeSettings();
+      showToast('success', 'Theme Reset', 'Default theme settings restored.');
+    };
+
+    // ── BANGLADESH REAL-TIME CLOCK (ONLINE SYNC) ──
+    let bdTimeOffsetMs = 0; // অনলাইন সার্ভারের সাথে লোকাল ঘড়ির পার্থক্য (মিলিসেকেন্ডে)
+
+    async function syncOnlineBangladeshTime() {
+      try {
+        // worldtimeapi.org থেকে বাংলাদেশের সঠিক সময় সিঙ্ক করো
+        const res = await fetch('https://worldtimeapi.org/api/timezone/Asia/Dhaka', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          const onlineTimeMs = new Date(data.datetime).getTime();
+          bdTimeOffsetMs = onlineTimeMs - Date.now();
+        }
+      } catch (_) {
+        // নেটওয়ার্ক বা API এরর হলে fallback হিসেবে local clock offset 0 থাকবে, Asia/Dhaka টাইমজোন ফরম্যাটিং কাজ করবে
+      }
+    }
+
+    function updateBangladeshClock() {
+      const dateEl = document.getElementById('bdClockDate');
+      const timeEl = document.getElementById('bdClockTime');
+      if (!dateEl || !timeEl) return;
+
+      // অনলাইন সিঙ্ক করা বর্তমান সময়
+      const now = new Date(Date.now() + bdTimeOffsetMs);
+
+      // তারিখ: DD/MM/YYYY
+      const dateStr = now.toLocaleDateString('en-GB', {
+        timeZone: 'Asia/Dhaka',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+
+      // সময়: HH:MM:SS AM/PM
+      const timeStr = now.toLocaleTimeString('en-US', {
+        timeZone: 'Asia/Dhaka',
+        hour12: true,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+
+      dateEl.textContent = dateStr;
+      timeEl.textContent = timeStr;
+    }
+
+    // ঘড়ি চালু করো ও প্রতি সেকেন্ডে আপডেট করো
+    setInterval(updateBangladeshClock, 1000);
+    updateBangladeshClock();
+    syncOnlineBangladeshTime();
+    // প্রতি ১৫ মিনিটে একবার অনলাইন থেকে সময় রিসিঙ্ক করো
+    setInterval(syncOnlineBangladeshTime, 15 * 60 * 1000);
+
+    // ── ADMIN LOGIN SYSTEM (MULTI-DEVICE TOKEN & REDIRECT TO MAIN.HTML) ──
+    window.openAdminLoginModal = function () {
+      const errEl = document.getElementById('adminLoginError');
+      if (errEl) { errEl.textContent = ''; errEl.classList.remove('show'); }
+      document.getElementById('adminUsername').value = '';
+      document.getElementById('adminPassword').value = '';
+      openModal('adminLoginModal');
+      setTimeout(() => document.getElementById('adminUsername').focus(), 100);
+    };
+
+    async function saveAdminRememberToken(username, token) {
+      const deviceId = getDeviceId();
+      const expires = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 দিন
+      try {
+        await setDoc(doc(db, 'admin', username), {
+          sessions: {
+            [deviceId]: { token, expires }
+          }
+        }, { merge: true });
+      } catch (e) {
+        console.warn('Admin token save failed:', e.message);
+      }
+    }
+
+    window.doAdminLogin = async function () {
+      const errEl = document.getElementById('adminLoginError');
+      errEl.textContent = ''; errEl.classList.remove('show');
+
+      const username = document.getElementById('adminUsername').value.trim();
+      const password = document.getElementById('adminPassword').value;
+      const remember = document.getElementById('adminRememberMe').checked;
+
+      if (!username) { errEl.textContent = 'Please enter Admin Username.'; errEl.classList.add('show'); return; }
+      if (!password) { errEl.textContent = 'Please enter Admin Password.'; errEl.classList.add('show'); return; }
+
+      const btn = document.getElementById('adminLoginBtn');
+      const btnText = document.getElementById('adminLoginBtnText');
+      btn.disabled = true;
+      btnText.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;"></span> Verifying Admin…';
+
+      try {
+        // Firebase "admin" collection থেকে verify করো
+        const userRef = doc(db, 'admin', username);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+          errEl.textContent = '❌ Invalid admin username or password.';
+          errEl.classList.add('show');
+          btn.disabled = false;
+          btnText.textContent = '🚀 Login as Admin';
+          return;
+        }
+
+        const userData = userSnap.data();
+        const storedPassword = userData.password || userData.passwoard || userData.pass || '';
+        if (storedPassword !== password) {
+          errEl.textContent = '❌ Invalid admin username or password.';
+          errEl.classList.add('show');
+          btn.disabled = false;
+          btnText.textContent = '🚀 Login as Admin';
+          return;
+        }
+
+        // অ্যাডমিন লগইন সফল! Multi-device Token System
+        const token = generateToken();
+        await saveAdminRememberToken(username, token);
+
+        if (remember) {
+          localStorage.setItem('fa_admin_user', username);
+          localStorage.setItem('fa_admin_token', token);
+          localStorage.setItem('fa_admin_remember', '1');
+          sessionStorage.removeItem('fa_admin_user');
+          sessionStorage.removeItem('fa_admin_token');
+        } else {
+          sessionStorage.setItem('fa_admin_user', username);
+          sessionStorage.setItem('fa_admin_token', token);
+          localStorage.removeItem('fa_admin_user');
+          localStorage.removeItem('fa_admin_token');
+          localStorage.removeItem('fa_admin_remember');
+        }
+
+        await logSystemActivity('ADMIN_LOGIN', `admin/${username}`, 'Admin logged in to access main.html dashboard');
+
+        btnText.textContent = '✅ Success! Redirecting...';
+        setTimeout(() => {
+          window.location.href = 'main.html';
+        }, 600);
+
+      } catch (e) {
+        errEl.textContent = 'Connection error: ' + e.message;
+        errEl.classList.add('show');
+        btn.disabled = false;
+        btnText.textContent = '🚀 Login as Admin';
+      }
+    };
+
+    async function logSystemActivity(action, target, details) {
+      try {
+        const user = localStorage.getItem('fa_logged_user') || localStorage.getItem('fa_admin_user') || 'Anonymous';
+        const newLogItem = {
+          id: 'item_' + Date.now() + '_' + Math.random().toString(36).substring(2,7),
+          timestamp: new Date().toISOString(),
+          user: user,
+          action: action,
+          target: target || '',
+          details: details || ''
+        };
+
+        const latestRef = doc(db, '_activity_log', 'chunk_latest');
+        const latestSnap = await getDoc(latestRef);
+
+        if (!latestSnap.exists() || !Array.isArray(latestSnap.data().logs) || latestSnap.data().logs.length >= 2000) {
+          if (latestSnap.exists() && Array.isArray(latestSnap.data().logs) && latestSnap.data().logs.length >= 2000) {
+            // Automatically rotate chunk when 2,000 limit is reached
+            const archiveId = 'chunk_archive_' + Date.now();
+            await setDoc(doc(db, '_activity_log', archiveId), {
+              chunk_id: archiveId,
+              archived_at: new Date().toISOString(),
+              logs: latestSnap.data().logs,
+              count: latestSnap.data().logs.length
+            });
+          }
+          await setDoc(latestRef, {
+            chunk_id: 'chunk_latest',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            logs: [ newLogItem ],
+            count: 1
+          });
+        } else {
+          await setDoc(latestRef, {
+            logs: arrayUnion(newLogItem),
+            count: latestSnap.data().logs.length + 1,
+            updated_at: new Date().toISOString()
+          }, { merge: true });
+        }
+      } catch (_) { }
+    }
+    // ── INIT ──
+    (async () => {
+      // লোড হওয়ার সাথে সাথে ব্যবহারকারীর থিম পছন্দ অ্যাপ্লাই করো
+      loadThemeSettings();
+      // প্রথমে auto-login চেক করো; login সফল হলে fetchFirestoreCollections() ডাকা হবে
+      await checkAutoLogin();
+    })();
+  </script>
+</body>
+
+</html>

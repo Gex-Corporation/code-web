@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — FireAdmin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0d14;
+      --bg-secondary: #111520;
+      --bg-card: #161b2e;
+      --bg-hover: #1e2540;
+      --bg-input: #0d1117;
+      --accent-blue: #4f8ef7;
+      --accent-purple: #a855f7;
+      --accent-cyan: #22d3ee;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-orange: #f97316;
+      --text-primary: #e8eaf0;
+      --text-secondary: #8892a4;
+      --text-muted: #4a5568;
+      --border: #1e2540;
+      --border-light: #2a3455;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --shadow-lg: 0 8px 48px rgba(0,0,0,0.6);
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-xs: 6px;
+      --gradient: linear-gradient(135deg, #4f8ef7, #a855f7);
+      --gradient-admin: linear-gradient(135deg, #ef4444, #a855f7);
+    }
+
+    body.theme-light {
+      --bg-primary: #f2f4f8;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-hover: #e8ecf4;
+      --bg-input: #ffffff;
+      --text-primary: #1e2540;
+      --text-secondary: #5a657e;
+      --text-muted: #8892a4;
+      --border: #dcdfe8;
+      --border-light: #c8cedc;
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 48px rgba(0,0,0,0.12);
+    }
+    body.theme-purple { --accent-blue: #a855f7; --gradient: linear-gradient(135deg, #a855f7, #ec4899); }
+    body.theme-green { --accent-blue: #10b981; --gradient: linear-gradient(135deg, #10b981, #06b6d4); }
+    body.theme-orange { --accent-blue: #f97316; --gradient: linear-gradient(135deg, #f97316, #eab308); }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent-blue); }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 64px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 18px; }
+    .logo-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--gradient-admin); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 0 16px rgba(239,68,68,0.3); }
+    .logo-text { background: var(--gradient-admin); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    .header-clock {
+      display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-primary);
+      background: var(--bg-card); padding: 6px 14px; border-radius: 99px; border: 1px solid var(--border);
+      font-weight: 600; box-shadow: inset 0 0 8px rgba(239,68,68,0.08);
+    }
+    .version-badge {
+      background: var(--gradient-admin);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 4px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+    }
+    .clock-flag { font-size: 15px; line-height: 1; }
+    .clock-date { color: var(--text-secondary); font-weight: 500; font-size: 12px; }
+    .clock-time { color: var(--accent-cyan); font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700; }
+
+    .admin-badge {
+      display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px;
+      font-size: 12px; font-weight: 600; background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3);
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 9px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); font-family: 'Inter', sans-serif;
+    }
+    .btn:active { transform: scale(0.95); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-primary { background: var(--gradient-admin); color: #fff; box-shadow: 0 2px 10px rgba(239,68,68,0.3); }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(239,68,68,0.45); }
+    .btn-secondary { background: var(--bg-card); border: 1px solid var(--border-light); color: var(--text-primary); }
+    .btn-secondary:hover { background: var(--bg-hover); border-color: var(--accent-blue); }
+    .btn-danger { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: var(--accent-red); }
+    .btn-danger:hover { background: rgba(239,68,68,0.25); }
+
+    /* ── TABS NAV ── */
+    .tabs-bar {
+      background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+      padding: 0 24px; display: flex; gap: 16px; align-items: center;
+    }
+    .tab-btn {
+      padding: 14px 20px; background: none; border: none; border-bottom: 2px solid transparent;
+      color: var(--text-secondary); font-size: 14px; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
+    }
+    .tab-btn:hover { color: var(--text-primary); }
+    .tab-btn.active { color: #ef4444; border-bottom-color: #ef4444; }
+
+    /* ── MAIN CONTENT ── */
+    .main-container { max-width: 1360px; margin: 0 auto; padding: 28px 24px; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .panel-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 24px; box-shadow: var(--shadow); margin-bottom: 24px;
+    }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+    }
+    .panel-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+
+    .skeleton-text { height: 16px; margin-bottom: 8px; width: 100%; background: var(--bg-hover); border-radius: 4px; }
+    .skeleton-text.short { width: 60%; margin-bottom: 0; }
+
+    /* Empty States */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+    .empty-state h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); margin: 0 0 8px 0; }
+    .empty-state p { font-size: 13px; margin: 0; }
+
+    /* ── TABLE ── */
+    .table-responsive { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      text-align: left; padding: 12px 16px; background: var(--bg-secondary);
+      color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border);
+    }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: var(--text-primary); transition: background-color 0.2s ease; }
+    tr { transition: transform 0.2s ease; }
+    tr:hover { transform: translateX(4px); }
+    tr:hover td { background: var(--bg-hover); }
+
+    .role-badge {
+      padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    }
+    .role-user { background: rgba(79,142,247,0.15); color: #4f8ef7; }
+    .role-manager { background: rgba(168,85,247,0.15); color: #a855f7; }
+    .role-admin { background: rgba(239,68,68,0.15); color: #ef4444; }
+
+    .search-box {
+      background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 8px 14px; color: var(--text-primary); font-size: 13px; width: 260px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-box:focus { border-color: var(--accent-blue); }
+
+    /* ── MODALS ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+      z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius);
+      width: 100%; max-width: 500px; box-shadow: var(--shadow-lg); overflow: hidden;
+      transform: scale(0.95); transition: transform 0.25s;
+    }
+    .modal-overlay.show .modal { transform: scale(1); }
+    .modal-header {
+      padding: 18px 22px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .modal-title { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .btn-close { background: none; border: none; color: var(--text-secondary); font-size: 20px; cursor: pointer; padding: 4px; }
+    .btn-close:hover { color: var(--text-primary); }
+    .modal-body { padding: 22px; }
+    .modal-footer { padding: 14px 22px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+    .form-control {
+      width: 100%; background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: var(--radius-xs); padding: 10px 14px; color: var(--text-primary);
+      font-size: 14px; outline: none; transition: border-color 0.2s;
+    }
+    .form-control:focus { border-color: var(--accent-blue); }
+
+    /* ── TOAST ── */
+    #toastContainer { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast {
+      background: var(--bg-card); border: 1px solid var(--border-light); border-radius: var(--radius-sm);
+      padding: 14px 18px; width: 320px; box-shadow: var(--shadow-lg); display: flex; gap: 12px;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .toast-icon { font-size: 20px; }
+    .toast-content { flex: 1; }
+    .toast-title { font-size: 13px; font-weight: 600; }
+    .toast-msg { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* ── THEME CUSTOMIZER ── */
+    .theme-grid { display: flex; gap: 10px; flex-wrap: wrap; }
+    .theme-btn {
+      flex: 1; min-width: 100px; padding: 12px 14px; background: var(--bg-input);
+      border: 2px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary);
+      font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .theme-btn.active { border-color: var(--accent-blue); background: rgba(79,142,247,0.08); color: var(--accent-blue); }
+    .color-swatch { width: 16px; height: 16px; border-radius: 50%; display: inline-block; }
+    .loading-spinner { padding: 40px; text-align: center; color: var(--text-secondary); }
+    .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: #ef4444; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── MOBILE VIEW OPTIMIZATION ── */
+    @media (max-width: 768px) {
+      header {
+        height: auto !important;
+        min-height: 60px;
+        padding: 12px 14px !important;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      .logo {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 8px !important;
+      }
+      .logo-text {
+        font-size: 15px !important;
+      }
+      header > div:last-child {
+        width: 100%;
+        justify-content: flex-start;
+        align-items: center !important;
+        gap: 8px !important;
+        flex-wrap: wrap !important;
+      }
+      header .btn {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+      }
+      .header-clock {
+        display: none !important;
+      }
+      .main-container {
+        padding: 14px 10px !important;
+      }
+      .tabs-bar {
+        padding: 0 10px !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch;
+      }
+      .tab-btn {
+        padding: 12px 14px !important;
+        font-size: 13px !important;
+      }
+      .panel-card {
+        padding: 16px 12px !important;
+      }
+      .panel-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+      }
+      .panel-header > div {
+        width: 100% !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+      }
+      .panel-header .search-box {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .panel-header .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+      }
+      .table-responsive {
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        font-size: 12px !important;
+      }
+      th, td {
+        padding: 8px 6px !important;
+        white-space: nowrap;
+      }
+      .modal-overlay {
+        padding: 10px !important;
+      }
+      .modal {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 18px !important;
+        border-radius: 12px !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">👑</div>
+      <span class="logo-text">FireAdmin — Admin Center</span>
+      <span class="admin-badge">🔐 Administrator</span>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div class="header-clock" id="bdRealTimeClock" title="Real-time Online Bangladesh Time (Asia/Dhaka)">
+        <span class="version-badge">V-1</span>
+        <span class="clock-flag">🇧🇩</span>
+        <span id="bdClockDate" class="clock-date">--/--/----</span>
+        <span id="bdClockTime" class="clock-time">--:--:-- --</span>
+      </div>
+
+      <button class="btn btn-secondary btn-sm" onclick="openModal('themeModal')" style="border-radius:99px;">🎨 Theme</button>
+      <a href="index.html" class="btn btn-secondary btn-sm" style="border-radius:99px;text-decoration:none;">⬅ Back to Data Panel</a>
+      <span id="adminLoggedName" style="font-size:13px;color:var(--text-secondary);font-weight:600;"></span>
+      <button class="btn btn-danger btn-sm" onclick="doAdminLogout()">⏻ Logout</button>
+    </div>
+  </header>
+
+  <!-- TABS NAV -->
+  <div class="tabs-bar">
+    <button class="tab-btn active" id="tabBtnUsers" onclick="switchTab('users')">
+      <span>👥</span> User Management Panel
+    </button>
+    <button class="tab-btn" id="tabBtnRequests" onclick="switchTab('requests')">
+      <span>📩</span> Registration Requests
+      <span id="requestsBadge" style="display:none;background:#ef4444;color:#fff;border-radius:99px;padding:1px 7px;font-size:11px;font-weight:700;margin-left:4px;">0</span>
+    </button>
+    <button class="tab-btn" id="tabBtnLogs" onclick="switchTab('logs')">
+      <span>📋</span> Activity Log
+    </button>
+    <button class="tab-btn" id="tabBtnBackup" onclick="switchTab('backup')">
+      <span>💾</span> Backup & Restore
+    </button>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <div class="main-container">
+
+    <!-- ── TAB 1: USER MANAGEMENT ── -->
+    <div class="tab-pane active" id="paneUsers">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title"><span>👥</span> Firebase "users" Collection Management</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="text" class="search-box" id="userSearchInput" placeholder="🔍 Filter username..." oninput="filterUserTable()" />
+            <button class="btn btn-primary" onclick="openAddUserModal()">➕ Add New User</button>
+            <button class="btn btn-secondary" onclick="loadUsersTable()" title="Refresh Users">🔄 Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Username (Doc ID)</th>
+                <th>Role</th>
+                <th>Active Devices (Sessions)</th>
+                <th>Allowed Collections</th>
+                <th>Created / Updated</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userTableBody">
+              <tr>
+                <td style="padding:16px;"><div class="skeleton-text" style="width:70%;margin:0;"></div></td>
+                <td style="padding:16px;"><div class="skeleton-text short" style="margin:0;"></div></td>
+                <td style="padding:16px;"><div class="skeleton-text" style="width:50%;margin:0;"></div></td>
+                <td style="padding:16px;"><div class="skeleton-text short" style="margin:0;"></div></td>
+                <td style="padding:16px;"><div class="skeleton-text" style="width:80%;margin:0;"></div></td>
+                <td style="padding:16px;text-align:right;"><div class="skeleton-text short" style="margin:0 0 0 auto;"></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB 2: REGISTRATION REQUESTS ── -->
+    <div class="tab-pane" id="paneRequests">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title"><span>📩</span> Pending Registration Requests</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button class="btn btn-secondary btn-sm" onclick="loadRegistrationRequests()" title="Refresh">🔄 Refresh</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Country</th>
+                <th>Password</th>
+                <th>Requested At</th>
+                <th style="text-align:center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="requestsTableBody">
+              <tr>
+                <td style="padding:16px;"><div class="skeleton-text" style="width:70%;margin:0;"></div></td>
+                <td style="padding:16px;"><div class="skeleton-text short" style="margin:0;"></div></td>
+                <td style="padding:16px;"><div class="skeleton-text" style="width:50%;margin:0;"></div></td>
+                <td style="padding:16px;"><div class="skeleton-text short" style="margin:0;"></div></td>
+                <td style="padding:16px;text-align:right;"><div class="skeleton-text short" style="margin:0 0 0 auto;"></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB 3: ACTIVITY LOG ── -->
+    <div class="tab-pane" id="paneLogs">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title"><span>📋</span> System Activity Logs</div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input type="text" class="search-box" id="logSearchInput" placeholder="🔍 Search action or user..." oninput="filterLogTable()" />
+            <button class="btn btn-danger btn-sm" onclick="clearActivityLogs()">🗑 Clear Logs</button>
+            <button class="btn btn-secondary btn-sm" onclick="loadActivityLogs()" title="Refresh Logs">🔄 Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>User / Admin</th>
+                <th>Action Type</th>
+                <th>Collection / Document</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody">
+              <tr>
+                <td style="padding:16px;"><div class="skeleton-text" style="width:70%;margin:0;"></div></td>
+                <td style="padding:16px;"><div class="skeleton-text short" style="margin:0;"></div></td>
+                <td style="padding:16px;"><div class="skeleton-text" style="width:50%;margin:0;"></div></td>
+                <td style="padding:16px;"><div class="skeleton-text short" style="margin:0;"></div></td>
+                <td style="padding:16px;text-align:right;"><div class="skeleton-text short" style="margin:0 0 0 auto;"></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB 4: BACKUP & RESTORE ── -->
+    <div class="tab-pane" id="paneBackup">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:20px;">
+
+        <!-- BACKUP EXPORT CARD -->
+        <div class="panel-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div class="panel-header">
+              <div class="panel-title"><span>⬇️</span> Export / Backup Firebase Data</div>
+            </div>
+            <div style="padding:16px 0;color:var(--text-secondary);font-size:13px;line-height:1.6;">
+              Download all collections and documents from your Firebase Firestore database into a clean, structured JSON backup file. You can specify which collections to include below.
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <label class="form-label" style="margin:0;">Collections to Backup (all 6 collections)</label>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="autoDetectAllCollections()" style="padding:4px 10px;font-size:11px;">🔍 Auto-Detect from Firebase</button>
+              </div>
+              <input type="text" class="form-control" id="backupCollectionsInput" value="users, admin, _activity_log, Collections, gex_panel, siam_panels" placeholder="e.g. users, admin, _activity_log, Collections, gex_panel, siam_panels" />
+              <small style="color:var(--text-secondary);font-size:11px;margin-top:4px;display:block;">All 6 collections (and their documents) are selected by default for complete backup & restore.</small>
+            </div>
+            <div id="backupStatusText" style="margin-top:14px;font-size:13px;font-weight:600;min-height:20px;color:var(--accent-blue);">
+              💡 Ready to download complete backup of all 6 collections.
+            </div>
+          </div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+            <button class="btn btn-primary" id="btnExportBackup" onclick="exportFirebaseBackup()" style="width:100%;justify-content:center;padding:12px;font-size:14px;">
+              ⬇️ Download Backup (JSON)
+            </button>
+          </div>
+        </div>
+
+        <!-- RESTORE IMPORT CARD -->
+        <div class="panel-card" style="display:flex;flex-direction:column;justify-content:space-between;">
+          <div>
+            <div class="panel-header">
+              <div class="panel-title"><span>⬆️</span> Restore Data from JSON Backup</div>
+            </div>
+            <div style="padding:16px 0;color:var(--text-secondary);font-size:13px;line-height:1.6;">
+              Select a previously downloaded JSON backup file to import and restore documents into your Firebase Firestore collections.
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+              <label class="form-label">Select JSON Backup File</label>
+              <input type="file" class="form-control" id="restoreFileInput" accept=".json" style="padding:10px;" />
+            </div>
+            <div style="margin-top:14px;">
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;color:var(--text-primary);">
+                <input type="checkbox" id="restoreMergeCheckbox" checked />
+                <span>Merge with existing documents (do not overwrite untouched data)</span>
+              </label>
+            </div>
+            <div id="restoreStatusText" style="margin-top:14px;font-size:13px;font-weight:600;min-height:20px;color:var(--accent-green);">
+              💡 Select a file to begin restoring.
+            </div>
+          </div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+            <button class="btn btn-secondary" id="btnRestoreBackup" onclick="restoreFirebaseBackup()" style="width:100%;justify-content:center;padding:12px;font-size:14px;background:var(--accent-green);color:#fff;border:none;">
+              ⬆️ Upload & Restore Data
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ADD / EDIT USER MODAL -->
+  <div class="modal-overlay" id="userModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="userModalTitle">➕ Add New User</div>
+        <button class="btn-close" onclick="closeModal('userModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Username (Document ID)</label>
+          <input type="text" class="form-control" id="modalUsername" placeholder="e.g. rahim_123" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="text" class="form-control" id="modalPassword" placeholder="Enter secure password" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          <select class="form-control" id="modalRole" onchange="onRoleChange()">
+            <option value="Standard">Standard Access (স্ট্যান্ডার্ড এক্সেস)</option>
+            <option value="Admin">Admin Access (এডমিন অ্যাক্সেস)</option>
+          </select>
+        </div>
+        <div class="form-group" id="allowedCollectionsGroup">
+          <label class="form-label">📂 Allowed Collections
+            <span style="font-size:11px;color:var(--text-muted);font-weight:400;"> (comma-separated, e.g. gex_panel, siam_panels)</span>
+          </label>
+          <input type="text" class="form-control" id="modalAllowedCollections" placeholder="e.g. gex_panel, siam_panels" />
+          <small style="color:var(--text-secondary);font-size:11px;margin-top:4px;display:block;">⚠️ Admin role হলে এটি ব্যবহার হবে না — Admin সব দেখতে পারে।</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('userModal')">Cancel</button>
+        <button class="btn btn-primary" id="saveUserBtn" onclick="saveUserData()">💾 Save User</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- THEME CUSTOMIZER MODAL -->
+  <div class="modal-overlay" id="themeModal">
+    <div class="modal" style="max-width:440px;">
+      <div class="modal-header">
+        <div class="modal-title">🎨 Theme Customizer</div>
+        <button class="btn-close" onclick="closeModal('themeModal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom:20px;">
+          <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;">Color Scheme</div>
+          <div class="theme-grid">
+            <button class="theme-btn" id="btnModeDark" onclick="setThemeMode('dark')">🌙 Dark Mode</button>
+            <button class="theme-btn" id="btnModeLight" onclick="setThemeMode('light')">☀️ Light Mode</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;">Accent Color</div>
+          <div class="theme-grid">
+            <button class="theme-btn" id="btnAccentBlue" onclick="setThemeAccent('blue')"><span class="color-swatch" style="background:#4f8ef7;"></span> Blue</button>
+            <button class="theme-btn" id="btnAccentPurple" onclick="setThemeAccent('purple')"><span class="color-swatch" style="background:#a855f7;"></span> Purple</button>
+            <button class="theme-btn" id="btnAccentGreen" onclick="setThemeAccent('green')"><span class="color-swatch" style="background:#10b981;"></span> Green</button>
+            <button class="theme-btn" id="btnAccentOrange" onclick="setThemeAccent('orange')"><span class="color-swatch" style="background:#f97316;"></span> Orange</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeModal('themeModal')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toastContainer"></div>
+
+  <!-- FIREBASE & LOGIC SCRIPT -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, addDoc, setDoc,
+      doc, deleteDoc, getDoc, updateDoc, deleteField, arrayUnion,
+      initializeFirestore, persistentLocalCache, persistentMultipleTabManager, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBCu63RjqZTs7aTUBDGRYh0_CtiQGXu3GM",
+      authDomain: "panel-aebbf.firebaseapp.com",
+      projectId: "panel-aebbf",
+      storageBucket: "panel-aebbf.firebasestorage.app",
+      messagingSenderId: "459148323115",
+      appId: "1:459148323115:web:f1109b6b254a26bfc27d6e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    let db;
+    try {
+      db = initializeFirestore(app, {
+        localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+      });
+    } catch (e) {
+      console.warn("Persistent cache failed, falling back to default firestore.", e);
+      db = getFirestore(app);
+    }
+
+    // ── EMPTY STATE SVGS ──
+    const svgEmptyUsers = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px; opacity:0.3;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>`;
+    const svgEmptyReqs = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px; opacity:0.3;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+    const svgEmptyLogs = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px; opacity:0.3;"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>`;
+
+    let allUsers = [];
+    let allRequests = [];
+    let allLogs = [];
+
+    // ── DEBOUNCE HELPER ──
+    function debounce(func, delay) {
+      let timeoutId;
+      return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    }
+
+    // ── BANGLADESH CLOCK (ONLINE SYNC) ──
+    let bdTimeOffsetMs = 0;
+    async function syncOnlineTime() {
+      try {
+        const res = await fetch('https://worldtimeapi.org/api/timezone/Asia/Dhaka', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          bdTimeOffsetMs = new Date(data.datetime).getTime() - Date.now();
+        }
+      } catch(_) {}
+    }
+    function updateClock() {
+      try {
+        const now = new Date(Date.now() + bdTimeOffsetMs);
+        const dEl = document.getElementById('bdClockDate');
+        const tEl = document.getElementById('bdClockTime');
+        if (dEl && tEl) {
+          dEl.textContent = now.toLocaleDateString('en-GB', { timeZone: 'Asia/Dhaka', day:'2-digit', month:'2-digit', year:'numeric' });
+          tEl.textContent = now.toLocaleTimeString('en-US', { timeZone: 'Asia/Dhaka', hour12:true, hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        }
+      } catch (e) {
+        console.warn("Clock update failed, possibly unsupported timezone:", e);
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+    syncOnlineTime();
+
+    // ── ADMIN GUARD (MULTI-DEVICE TOKEN VERIFICATION) ──
+    async function verifyAdminAccess() {
+      const adminUser = localStorage.getItem('fa_admin_user') || sessionStorage.getItem('fa_admin_user') || localStorage.getItem('fa_user') || sessionStorage.getItem('fa_user');
+      const adminToken = localStorage.getItem('fa_admin_token') || sessionStorage.getItem('fa_admin_token') || localStorage.getItem('fa_token') || sessionStorage.getItem('fa_token');
+
+      if (!adminUser || !adminToken) {
+        redirectToLogin();
+        return;
+      }
+
+      try {
+        // 1. FIRST check the dedicated 'admin' collection (Admin User access)
+        const adminSnap = await getDoc(doc(db, 'admin', adminUser));
+        if (adminSnap.exists()) {
+          const data = adminSnap.data();
+          let valid = false;
+          if (data.sessions) {
+            for (let devId in data.sessions) {
+              const s = data.sessions[devId];
+              if (s.token === adminToken && (!s.expires || s.expires > Date.now())) {
+                valid = true;
+                break;
+              }
+            }
+          }
+          if (valid) {
+            document.getElementById('adminLoggedName').textContent = `👤 ${adminUser}`;
+            loadUsersTable();
+            loadActivityLogs();
+            return;
+          }
+        }
+
+        // 2. Fallback check: check if the user is an Admin in the 'users' collection (User Admin access)
+        const userSnap = await getDoc(doc(db, 'users', adminUser));
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          const role = (data.role || '').toLowerCase();
+          const isAdmin = (role === 'admin' || role === 'admin access' || role === 'administrator');
+          let valid = false;
+          if (data.sessions) {
+            for (let devId in data.sessions) {
+              const s = data.sessions[devId];
+              if (s.token === adminToken && (!s.expires || s.expires > Date.now())) {
+                valid = true;
+                break;
+              }
+            }
+          }
+          if (isAdmin && valid) {
+            document.getElementById('adminLoggedName').textContent = `👤 ${adminUser}`;
+            loadUsersTable();
+            loadActivityLogs();
+            return;
+          }
+        }
+
+        redirectToLogin();
+
+      } catch(e) {
+        console.warn('Admin verification error:', e.message);
+        redirectToLogin();
+      }
+    }
+
+    function redirectToLogin() {
+      showToast('error', 'Access Denied', 'Please sign in as Admin.');
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1000);
+    }
+
+    window.doAdminLogout = async function() {
+      localStorage.removeItem('fa_admin_user');
+      localStorage.removeItem('fa_admin_token');
+      localStorage.removeItem('fa_admin_remember');
+      sessionStorage.removeItem('fa_admin_user');
+      sessionStorage.removeItem('fa_admin_token');
+      sessionStorage.removeItem('fa_user');
+      sessionStorage.removeItem('fa_token');
+      window.location.href = 'index.html';
+    };
+
+    // ── TABS SWITCHING ──
+    window.switchTab = function(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+      if (tabName === 'users') {
+        document.getElementById('tabBtnUsers').classList.add('active');
+        document.getElementById('paneUsers').classList.add('active');
+        loadUsersTable();
+      } else if (tabName === 'requests') {
+        document.getElementById('tabBtnRequests').classList.add('active');
+        document.getElementById('paneRequests').classList.add('active');
+        loadRegistrationRequests();
+      } else if (tabName === 'logs') {
+        document.getElementById('tabBtnLogs').classList.add('active');
+        document.getElementById('paneLogs').classList.add('active');
+        loadActivityLogs();
+      } else if (tabName === 'backup') {
+        document.getElementById('tabBtnBackup').classList.add('active');
+        document.getElementById('paneBackup').classList.add('active');
+      }
+    };
+
+    // ── USER MANAGEMENT ("users" COLLECTION) ──
+    let unsubscribeUsers = null;
+    window.loadUsersTable = async function() {
+      const tbody = document.getElementById('userTableBody');
+      let skel = '';
+      for(let i=0; i<3; i++) {
+        skel += `<tr>
+          <td style="padding:16px;"><div class="skeleton-text" style="width:70%;margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton-text short" style="margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton-text" style="width:50%;margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton-text short" style="margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton-text" style="width:80%;margin:0;"></div></td>
+          <td style="padding:16px;text-align:right;"><div class="skeleton-text short" style="margin:0 0 0 auto;"></div></td>
+        </tr>`;
+      }
+      tbody.innerHTML = skel;
+      
+      if (unsubscribeUsers) {
+        unsubscribeUsers();
+        unsubscribeUsers = null;
+      }
+      
+      try {
+        unsubscribeUsers = onSnapshot(collection(db, 'users'), (snap) => {
+          allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+          renderUserTable();
+        }, (e) => {
+          tbody.innerHTML = `<tr><td colspan="6" style="color:var(--accent-red);text-align:center;padding:30px;">❌ Error loading users: ${e.message}</td></tr>`;
+        });
+      } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color:var(--accent-red);text-align:center;padding:30px;">❌ Error loading users: ${e.message}</td></tr>`;
+      }
+    };
+
+    window.renderUserTable = function() {
+      const tbody = document.getElementById('userTableBody');
+      const q = (document.getElementById('userSearchInput').value || '').toLowerCase();
+      const filtered = allUsers.filter(u => u.id.toLowerCase().includes(q) || (u.role && u.role.toLowerCase().includes(q)));
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">${svgEmptyUsers}<h3>No users found</h3><p>Try adjusting your search query.</p></div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(u => {
+        const uRole = (u.role || '').toLowerCase();
+        const isAdmin = (uRole === 'admin' || uRole === 'admin access' || uRole === 'administrator');
+        const roleDisplay = isAdmin ? 'Admin Access' : 'Standard Access';
+        const roleClass = isAdmin ? 'role-admin' : 'role-user';
+        const activeDevicesCount = u.sessions ? Object.keys(u.sessions).length : 0;
+        const created = u.updated_at || u.created_at || 'N/A';
+        const createdFormatted = created !== 'N/A' ? new Date(created).toLocaleString() : 'N/A';
+        const allowedCols = Array.isArray(u.allowed_collections) && u.allowed_collections.length > 0
+          ? u.allowed_collections.join(', ')
+          : (isAdmin ? '<span style="color:var(--accent-green);font-size:11px;">All (Admin)</span>' : '<span style="color:var(--text-muted);font-size:11px;">None assigned</span>');
+
+        return `
+          <tr>
+            <td><strong style="color:var(--text-primary);">👤 ${u.id}</strong></td>
+            <td><span class="role-badge ${roleClass}">${roleDisplay}</span></td>
+            <td>
+              <span style="display:inline-block;padding:4px 10px;border-radius:99px;background:var(--bg-input);font-size:12px;border:1px solid var(--border);">
+                📱 ${activeDevicesCount} Device(s) Logged In
+              </span>
+            </td>
+            <td style="font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${allowedCols}</td>
+            <td style="color:var(--text-secondary);font-size:12px;">${createdFormatted}</td>
+            <td style="text-align:right;">
+              <div style="display:inline-flex;gap:6px;">
+                <button class="btn btn-secondary btn-sm" onclick="editUser('${u.id}')" title="Edit Role/Password">✏️ Edit</button>
+                <button class="btn btn-secondary btn-sm" onclick="clearUserSessions('${u.id}')" title="Force Logout All Devices" ${activeDevicesCount === 0 ? 'disabled style="opacity:0.5;"' : ''}>🔐 Clear Sessions</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}')" title="Delete User">🗑 Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    window.filterUserTable = debounce(function() { renderUserTable(); }, 300);
+
+    window.openAddUserModal = function() {
+      document.getElementById('userModalTitle').textContent = '➕ Add New User';
+      document.getElementById('modalUsername').value = '';
+      document.getElementById('modalUsername').disabled = false;
+      document.getElementById('modalPassword').value = '';
+      document.getElementById('modalRole').value = 'Standard';
+      document.getElementById('modalAllowedCollections').value = '';
+      document.getElementById('allowedCollectionsGroup').style.display = 'block';
+      openModal('userModal');
+    };
+
+    window.onRoleChange = function() {
+      const role = document.getElementById('modalRole').value;
+      document.getElementById('allowedCollectionsGroup').style.display = role === 'Admin' ? 'none' : 'block';
+    };
+
+    window.editUser = function(userId) {
+      const u = allUsers.find(x => x.id === userId);
+      if (!u) return;
+      document.getElementById('userModalTitle').textContent = `✏️ Edit User (${userId})`;
+      document.getElementById('modalUsername').value = userId;
+      document.getElementById('modalUsername').disabled = true;
+      document.getElementById('modalPassword').value = u.password || '';
+      const uRole = (u.role || '').toLowerCase();
+      const isAdmin = (uRole === 'admin' || uRole === 'admin access' || uRole === 'administrator');
+      document.getElementById('modalRole').value = isAdmin ? 'Admin' : 'Standard';
+      const allowedCols = Array.isArray(u.allowed_collections) ? u.allowed_collections.join(', ') : '';
+      document.getElementById('modalAllowedCollections').value = allowedCols;
+      document.getElementById('allowedCollectionsGroup').style.display = isAdmin ? 'none' : 'block';
+      openModal('userModal');
+    };
+
+    window.saveUserData = async function() {
+      const username = document.getElementById('modalUsername').value.trim();
+      const password = document.getElementById('modalPassword').value.trim();
+      const role = document.getElementById('modalRole').value;
+      const allowedColsRaw = document.getElementById('modalAllowedCollections').value;
+      const allowedCollections = role === 'Admin'
+        ? []
+        : allowedColsRaw.split(',').map(s => s.trim()).filter(Boolean);
+
+      if (!username || !password) {
+        showToast('error', 'Validation Error', 'Username and Password are required.');
+        return;
+      }
+
+      const btn = document.getElementById('saveUserBtn');
+      btn.disabled = true;
+      btn.textContent = '⏳ Saving…';
+
+      try {
+        const userDoc = {
+          password: password,
+          passwoard: password,
+          role: role,
+          allowed_collections: allowedCollections,
+          updated_at: new Date().toISOString()
+        };
+        await setDoc(doc(db, 'users', username), userDoc, { merge: true });
+
+        // Sync with "admin" collection based on role
+        if (role === 'Admin') {
+          await setDoc(doc(db, 'admin', username), {
+            password: password,
+            passwoard: password,
+            role: 'Admin',
+            updated_at: new Date().toISOString()
+          }, { merge: true });
+        } else {
+          try { await deleteDoc(doc(db, 'admin', username)); } catch(_) {}
+        }
+
+        showToast('success', 'User Saved', `User "${username}" has been updated successfully.`);
+        closeModal('userModal');
+        loadUsersTable();
+      } catch(e) {
+        showToast('error', 'Save Failed', e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 Save User';
+      }
+    };
+
+    window.clearUserSessions = async function(userId) {
+      if (!confirm(`Are you sure you want to force logout user "${userId}" from all devices?`)) return;
+      try {
+        await updateDoc(doc(db, 'users', userId), {
+          sessions: deleteField()
+        });
+        showToast('success', 'Sessions Cleared', `User "${userId}" is now logged out from all devices.`);
+        loadUsersTable();
+      } catch(e) {
+        showToast('error', 'Error', e.message);
+      }
+    };
+
+    window.deleteUser = async function(userId) {
+      if (!confirm(`Are you sure you want to delete user "${userId}"?`)) return;
+      try {
+        await deleteDoc(doc(db, 'users', userId));
+        try { await deleteDoc(doc(db, 'admin', userId)); } catch(_) {}
+        showToast('success', 'User Deleted', `User "${userId}" has been removed.`);
+        loadUsersTable();
+      } catch(e) {
+        showToast('error', 'Delete Failed', e.message);
+      }
+    };
+
+    // ── REGISTRATION REQUESTS SYSTEM ──
+    let unsubscribeRequests = null;
+
+    window.loadRegistrationRequests = async function() {
+      const tbody = document.getElementById('requestsTableBody');
+      let skel = '';
+      for(let i=0; i<3; i++) {
+        skel += `<tr>
+          <td style="padding:16px;"><div class="skeleton skeleton-text short" style="margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton skeleton-text" style="width:50%;margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton skeleton-text short" style="margin:0;"></div></td>
+          <td style="padding:16px;text-align:right;"><div class="skeleton skeleton-text short" style="margin:0 0 0 auto;"></div></td>
+        </tr>`;
+      }
+      tbody.innerHTML = skel;
+
+      if (unsubscribeRequests) { unsubscribeRequests(); unsubscribeRequests = null; }
+
+      try {
+        unsubscribeRequests = onSnapshot(collection(db, 'registration_requests'), (snap) => {
+          allRequests = snap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(r => r.status === 'pending')
+            .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+          renderRequestsTable();
+          // Update badge count
+          const badge = document.getElementById('requestsBadge');
+          if (badge) {
+            badge.textContent = allRequests.length;
+            badge.style.display = allRequests.length > 0 ? 'inline-block' : 'none';
+          }
+        }, () => {
+          tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">${svgEmptyReqs}<h3>No pending requests</h3><p>All clear! There are no new registration requests.</p></div></td></tr>`;
+        });
+      } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--accent-red);text-align:center;padding:30px;">❌ Error: ${e.message}</td></tr>`;
+      }
+    };
+
+    function renderRequestsTable() {
+      const tbody = document.getElementById('requestsTableBody');
+      if (!allRequests.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">${svgEmptyReqs}<h3>No pending requests</h3><p>All clear! There are no new registration requests.</p></div></td></tr>`;
+        return;
+      }
+      tbody.innerHTML = allRequests.map(r => {
+        const timeStr = r.created_at ? new Date(r.created_at).toLocaleString() : 'N/A';
+        return `
+          <tr>
+            <td><strong style="color:var(--text-primary);">👤 ${r.username || r.id}</strong></td>
+            <td><span style="font-size:13px;">🌍 ${r.country || 'N/A'}</span></td>
+            <td><code style="background:var(--bg-input);padding:3px 8px;border-radius:4px;font-size:12px;border:1px solid var(--border);">${r.password || '—'}</code></td>
+            <td style="color:var(--text-secondary);font-size:12px;">🕒 ${timeStr}</td>
+            <td style="text-align:center;">
+              <div style="display:inline-flex;gap:8px;">
+                <button class="btn btn-sm" style="background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.4);" onclick="acceptRequest('${r.id}')">
+                  ✅ Accept
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="rejectRequest('${r.id}')">
+                  ❌ Reject
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    window.acceptRequest = async function(reqId) {
+      const req = allRequests.find(r => r.id === reqId);
+      if (!req) return showToast('error', 'Error', 'Request data not found.');
+
+      const username = req.username || req.id;
+      const password = req.password || '';
+      const country = req.country || '';
+
+      if (!confirm(`Accept registration for "${username}"? This will create a user account.`)) return;
+      try {
+        // Create user in 'users' collection
+        await setDoc(doc(db, 'users', username), {
+          password: password,
+          passwoard: password,
+          role: 'Standard',
+          allowed_collections: [],
+          country: country,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+        // Update request status to accepted
+        await setDoc(doc(db, 'registration_requests', reqId), { status: 'accepted', accepted_at: new Date().toISOString() }, { merge: true });
+        showToast('success', 'Request Accepted', `User "${username}" has been created. They can now login.`);
+        await logAdminActivity('ACCEPT_REGISTRATION', `users/${username}`, `Accepted registration for ${username} from ${country}`);
+        loadUsersTable();
+      } catch(e) {
+        showToast('error', 'Accept Failed', e.message);
+      }
+    };
+
+    window.rejectRequest = async function(reqId) {
+      if (!confirm(`Reject and delete this registration request?`)) return;
+      try {
+        await deleteDoc(doc(db, 'registration_requests', reqId));
+        showToast('success', 'Request Rejected', 'The registration request has been removed.');
+        await logAdminActivity('REJECT_REGISTRATION', `registration_requests/${reqId}`, `Rejected registration request`);
+      } catch(e) {
+        showToast('error', 'Reject Failed', e.message);
+      }
+    };
+
+    // ── ACTIVITY LOG ("_activity_log" COLLECTION - CHUNKED 2000 LOGS PER DOC) ──
+    let unsubscribeLogs = null;
+    window.loadActivityLogs = async function() {
+      const tbody = document.getElementById('logTableBody');
+      let skel = '';
+      for(let i=0; i<3; i++) {
+        skel += `<tr>
+          <td style="padding:16px;"><div class="skeleton skeleton-text" style="width:70%;margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton skeleton-text short" style="margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton skeleton-text" style="width:50%;margin:0;"></div></td>
+          <td style="padding:16px;"><div class="skeleton skeleton-text short" style="margin:0;"></div></td>
+          <td style="padding:16px;text-align:right;"><div class="skeleton skeleton-text short" style="margin:0 0 0 auto;"></div></td>
+        </tr>`;
+      }
+      tbody.innerHTML = skel;
+      
+      if (unsubscribeLogs) {
+        unsubscribeLogs();
+        unsubscribeLogs = null;
+      }
+      
+      try {
+        unsubscribeLogs = onSnapshot(collection(db, '_activity_log'), (snap) => {
+          let combinedLogs = [];
+
+          snap.docs.forEach(d => {
+            const data = d.data();
+            if (Array.isArray(data.logs)) {
+              // Unroll 2000-log array chunk documents
+              data.logs.forEach(item => {
+                combinedLogs.push({
+                  id: item.id || d.id,
+                  doc_id: d.id,
+                  timestamp: item.timestamp || data.updated_at,
+                  user: item.user || 'System',
+                  action: item.action || 'GENERAL',
+                  target: item.target || 'N/A',
+                  details: item.details || '—'
+                });
+              });
+            } else {
+              // Support backward compatible individual log documents
+              combinedLogs.push({ id: d.id, doc_id: d.id, ...data });
+            }
+          });
+
+          allLogs = combinedLogs;
+          allLogs.sort((a,b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+          renderActivityLogs();
+        }, (e) => {
+          tbody.innerHTML = `<tr><td colspan="5" style="color:var(--text-secondary);text-align:center;padding:30px;">No activity logs found yet. Actions in the panel will appear here.</td></tr>`;
+        });
+      } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="5" style="color:var(--text-secondary);text-align:center;padding:30px;">No activity logs found yet. Actions in the panel will appear here.</td></tr>`;
+      }
+    };
+
+    window.renderActivityLogs = function() {
+      const tbody = document.getElementById('logTableBody');
+      const q = (document.getElementById('logSearchInput').value || '').toLowerCase();
+      const filtered = allLogs.filter(l =>
+        (l.action && l.action.toLowerCase().includes(q)) ||
+        (l.user && l.user.toLowerCase().includes(q)) ||
+        (l.details && l.details.toLowerCase().includes(q))
+      );
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state">${svgEmptyLogs}<h3>No logs found</h3><p>Try adjusting your search query.</p></div></td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(l => {
+        const timeStr = l.timestamp ? new Date(l.timestamp).toLocaleString() : 'N/A';
+        const actionType = l.action || 'GENERAL';
+        const badgeColor = actionType.includes('DELETE') ? '#ef4444' : actionType.includes('LOGIN') ? '#10b981' : '#4f8ef7';
+
+        return `
+          <tr>
+            <td style="color:var(--text-secondary);font-size:12px;white-space:nowrap;">🕒 ${timeStr}</td>
+            <td><strong>👤 ${l.user || 'System'}</strong></td>
+            <td>
+              <span style="padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;color:${badgeColor};background:${badgeColor}22;border:1px solid ${badgeColor}44;">
+                ${actionType}
+              </span>
+            </td>
+            <td style="font-family:'Courier New',monospace;color:var(--accent-cyan);">${l.target || 'N/A'}</td>
+            <td style="color:var(--text-primary);">${l.details || '—'}</td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    window.filterLogTable = debounce(function() { renderActivityLogs(); }, 300);
+
+    window.clearActivityLogs = async function() {
+      if (!confirm('Are you sure you want to delete all activity log records?')) return;
+      try {
+        const snap = await getDocs(collection(db, '_activity_log'));
+        for (let d of snap.docs) {
+          await deleteDoc(doc(db, '_activity_log', d.id));
+        }
+        showToast('success', 'Logs Cleared', 'All activity logs have been removed.');
+        loadActivityLogs();
+      } catch(e) {
+        showToast('error', 'Error Clearing Logs', e.message);
+      }
+    };
+
+    // ── MODALS & TOASTS ──
+    window.openModal = function(id) { document.getElementById(id).classList.add('show'); };
+    window.closeModal = function(id) { document.getElementById(id).classList.remove('show'); };
+
+    window.showToast = function(type, title, msg) {
+      const container = document.getElementById('toastContainer');
+      const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <div class="toast-icon">${icon}</div>
+        <div class="toast-content">
+          <div class="toast-title">${title}</div>
+          <div class="toast-msg">${msg}</div>
+        </div>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    };
+
+    // ── THEME CUSTOMIZER SYSTEM ──
+    let currentTheme = { mode: 'dark', accent: 'blue' };
+    function loadThemeSettings() {
+      try {
+        const saved = localStorage.getItem('fa_theme_settings');
+        if (saved) currentTheme = Object.assign(currentTheme, JSON.parse(saved));
+      } catch(_) {}
+      applyThemeSettings();
+    }
+    function applyThemeSettings() {
+      document.body.classList.remove('theme-light', 'theme-purple', 'theme-green', 'theme-orange');
+      if (currentTheme.mode === 'light') document.body.classList.add('theme-light');
+      if (currentTheme.accent !== 'blue') document.body.classList.add(`theme-${currentTheme.accent}`);
+    }
+    window.setThemeMode = function(mode) {
+      currentTheme.mode = mode;
+      localStorage.setItem('fa_theme_settings', JSON.stringify(currentTheme));
+      applyThemeSettings();
+    };
+    window.setThemeAccent = function(accent) {
+      currentTheme.accent = accent;
+      localStorage.setItem('fa_theme_settings', JSON.stringify(currentTheme));
+      applyThemeSettings();
+    };
+
+    // ── FIREBASE BACKUP & RESTORE SYSTEM (ALL 6+ COLLECTIONS) ──
+    async function logAdminActivity(action, target, details) {
+      try {
+        const adminUser = localStorage.getItem('fa_admin_user') || 'Admin';
+        const newLogItem = {
+          id: 'item_' + Date.now() + '_' + Math.random().toString(36).substring(2,7),
+          timestamp: new Date().toISOString(),
+          user: adminUser,
+          action: action,
+          target: target || '',
+          details: details || ''
+        };
+
+        const latestRef = doc(db, '_activity_log', 'chunk_latest');
+        const latestSnap = await getDoc(latestRef);
+
+        if (!latestSnap.exists() || !Array.isArray(latestSnap.data().logs) || latestSnap.data().logs.length >= 2000) {
+          if (latestSnap.exists() && Array.isArray(latestSnap.data().logs) && latestSnap.data().logs.length >= 2000) {
+            // Automatically rotate chunk when 2,000 limit is reached
+            const archiveId = 'chunk_archive_' + Date.now();
+            await setDoc(doc(db, '_activity_log', archiveId), {
+              chunk_id: archiveId,
+              archived_at: new Date().toISOString(),
+              logs: latestSnap.data().logs,
+              count: latestSnap.data().logs.length
+            });
+          }
+          await setDoc(latestRef, {
+            chunk_id: 'chunk_latest',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            logs: [ newLogItem ],
+            count: 1
+          });
+        } else {
+          await setDoc(latestRef, {
+            logs: arrayUnion(newLogItem),
+            count: latestSnap.data().logs.length + 1,
+            updated_at: new Date().toISOString()
+          }, { merge: true });
+        }
+      } catch(_) {}
+    }
+    window.logActivity = logAdminActivity;
+
+    window.autoDetectAllCollections = async function() {
+      const statusEl = document.getElementById('backupStatusText');
+      statusEl.textContent = '⏳ Auto-detecting all collections from Firebase...';
+      try {
+        const standardCols = ['users', 'admin', '_activity_log', 'Collections', 'gex_panel', 'siam_panels'];
+        let customCols = [];
+        try {
+          const snap = await getDoc(doc(db, 'Collections', 'names'));
+          if (snap.exists() && Array.isArray(snap.data().list)) {
+            customCols = snap.data().list;
+          }
+        } catch(_) {}
+
+        const allCols = Array.from(new Set([...standardCols, ...customCols])).filter(Boolean);
+        document.getElementById('backupCollectionsInput').value = allCols.join(', ');
+        statusEl.textContent = `✅ Detected ${allCols.length} collections: ${allCols.join(', ')}`;
+        showToast('success', 'Collections Detected', `Found ${allCols.length} collections ready for backup.`);
+        return allCols;
+      } catch(e) {
+        statusEl.textContent = `❌ Error detecting: ${e.message}`;
+        return ['users', 'admin', '_activity_log', 'Collections', 'gex_panel', 'siam_panels'];
+      }
+    };
+
+    window.exportFirebaseBackup = async function() {
+      let colStr = document.getElementById('backupCollectionsInput').value.trim();
+      if (!colStr) {
+        colStr = 'users, admin, _activity_log, Collections, gex_panel, siam_panels';
+      }
+      let colList = colStr.split(',').map(s => s.trim()).filter(Boolean);
+
+      const statusEl = document.getElementById('backupStatusText');
+      const btnEl = document.getElementById('btnExportBackup');
+      btnEl.disabled = true;
+      btnEl.innerHTML = '⏳ Exporting Data...';
+      statusEl.textContent = '⏳ Discovering all documents across collections...';
+
+      try {
+        // Automatically merge any custom collections registered in Collections/names
+        try {
+          const namesSnap = await getDoc(doc(db, 'Collections', 'names'));
+          if (namesSnap.exists() && Array.isArray(namesSnap.data().list)) {
+            colList = Array.from(new Set([...colList, ...namesSnap.data().list]));
+          }
+        } catch(_) {}
+
+        const backupData = {
+          backup_version: '2.0_full_db',
+          generator: 'FireAdmin Admin Center (Full Backup)',
+          export_time: new Date().toISOString(),
+          total_collections_count: colList.length,
+          collections: {}
+        };
+
+        let totalDocs = 0;
+        for (const colName of colList) {
+          statusEl.textContent = `⏳ Backing up collection: "${colName}"...`;
+          const snap = await getDocs(collection(db, colName));
+          const docList = [];
+          snap.docs.forEach(d => {
+            docList.push({ id: d.id, data: d.data() });
+          });
+          backupData.collections[colName] = docList;
+          totalDocs += docList.length;
+        }
+
+        const jsonStr = JSON.stringify(backupData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const datePart = new Date().toISOString().slice(0, 10);
+        a.download = `fireadmin_full_backup_${datePart}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        statusEl.textContent = `✅ Complete Backup Downloaded! (${totalDocs} documents across ${colList.length} collections: ${colList.join(', ')})`;
+        showToast('success', 'Full Backup Exported!', `Downloaded ${totalDocs} documents across ${colList.length} collections.`);
+        await logAdminActivity('BACKUP_EXPORT', colList.join(', '), `Exported complete backup of ${totalDocs} documents across ${colList.length} collections`);
+      } catch (e) {
+        statusEl.textContent = `❌ Backup Error: ${e.message}`;
+        showToast('error', 'Export Failed', e.message);
+      } finally {
+        btnEl.disabled = false;
+        btnEl.innerHTML = '⬇️ Download Backup (JSON)';
+      }
+    };
+
+    window.restoreFirebaseBackup = async function() {
+      const fileInput = document.getElementById('restoreFileInput');
+      const file = fileInput.files[0];
+      if (!file) {
+        showToast('error', 'No File Selected', 'Please choose a valid JSON backup file first.');
+        return;
+      }
+
+      const statusEl = document.getElementById('restoreStatusText');
+      const btnEl = document.getElementById('btnRestoreBackup');
+      const isMerge = document.getElementById('restoreMergeCheckbox').checked;
+
+      btnEl.disabled = true;
+      btnEl.innerHTML = '⏳ Restoring Data...';
+      statusEl.textContent = '⏳ Reading backup file...';
+
+      try {
+        const text = await file.text();
+        const backupData = JSON.parse(text);
+        if (!backupData.collections || typeof backupData.collections !== 'object') {
+          throw new Error('Invalid backup file format. Missing "collections" object.');
+        }
+
+        const colNames = Object.keys(backupData.collections);
+        let restoredCount = 0;
+
+        for (const colName of colNames) {
+          const docList = backupData.collections[colName];
+          if (!Array.isArray(docList)) continue;
+
+          for (let i = 0; i < docList.length; i++) {
+            const item = docList[i];
+            if (!item.id || !item.data) continue;
+            statusEl.textContent = `⏳ Restoring "${colName}/${item.id}" (${i + 1}/${docList.length})...`;
+            await setDoc(doc(db, colName, item.id), item.data, { merge: isMerge });
+            restoredCount++;
+          }
+        }
+
+        // Ensure Collections/names document is updated with all restored collection names
+        try {
+          const namesRef = doc(db, 'Collections', 'names');
+          const namesSnap = await getDoc(namesRef);
+          let existList = namesSnap.exists() && Array.isArray(namesSnap.data().list) ? namesSnap.data().list : [];
+          const nonSystemCols = colNames.filter(c => !['users','admin','_activity_log','Collections'].includes(c));
+          const mergedNames = Array.from(new Set([...existList, ...nonSystemCols]));
+          if (mergedNames.length) {
+            await setDoc(namesRef, { list: mergedNames }, { merge: true });
+          }
+        } catch(_) {}
+
+        statusEl.textContent = `✅ Restore completed! Successfully restored ${restoredCount} documents across ${colNames.length} collections (${colNames.join(', ')}).`;
+        showToast('success', 'Restore Complete!', `Restored ${restoredCount} documents across ${colNames.length} collections.`);
+        await logAdminActivity('BACKUP_RESTORE', colNames.join(', '), `Restored ${restoredCount} documents from "${file.name}"`);
+
+        if (colNames.includes('users')) {
+          loadUsersTable();
+        }
+      } catch (e) {
+        statusEl.textContent = `❌ Restore Error: ${e.message}`;
+        showToast('error', 'Restore Failed', e.message);
+      } finally {
+        btnEl.disabled = false;
+        btnEl.innerHTML = '⬆️ Upload & Restore Data';
+      }
+    };
+
+    // ── INIT ──
+    (async () => {
+      loadThemeSettings();
+      await verifyAdminAccess();
+      // Real-time watch on registration_requests to show badge even on users tab
+      onSnapshot(collection(db, 'registration_requests'), (snap) => {
+        const pending = snap.docs.filter(d => d.data().status === 'pending').length;
+        const badge = document.getElementById('requestsBadge');
+        if (badge) {
+          badge.textContent = pending;
+          badge.style.display = pending > 0 ? 'inline-block' : 'none';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
